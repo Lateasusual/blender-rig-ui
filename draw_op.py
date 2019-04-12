@@ -17,7 +17,6 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
     def __init__(self):
         # Called whenever the window is drawn
         # Called every 0.1 seconds
-        self.draw_handle = None
         # all buttons in UI
         self.buttons = []
 
@@ -45,33 +44,13 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         background_batch.draw(background_shader)
         bgl.glDisable(bgl.GL_BLEND)
 
-    def draw_callback_px(self, context):
-        # Draw everything
-        self.draw_background(context)
-
-        for b in self.buttons:
-            b.draw()
-
-    def register_handlers(self, context):
-        self.draw_handle = bpy.types.SpaceImageEditor.draw_handler_add(self.draw_callback_px,
-                                                                       (context,), 'WINDOW', 'POST_PIXEL')
-        # self.draw_event = context.window_manager.event_timer_add(0.1, window=context.window)
-
-    def unregister_handlers(self, context):
-        # context.window_manager.event_timer_remove(self.draw_event)
-
-        bpy.types.SpaceImageEditor.draw_handler_remove(self.draw_handle, 'WINDOW')
-        self.draw_handle = None
 
     def invoke(self, context, event):
-        if context.scene.rigUI_active:
-            context.scene.rigUI_active = False
-            return {'CANCELLED'}
-        self.register_handlers(context)
+        self.draw_handle = bpy.types.SpaceImageEditor.draw_handler_add(draw_callback_px, (self, context), 'WINDOW', 'POST_PIXEL')
         context.window_manager.modal_handler_add(self)
-        context.scene.rigUI_active = True
 
-        context.area.tag_redraw()
+        context.scene.rigUI_active = True
+        context.area.tag_redraw() # update image editor view
         return {"RUNNING_MODAL"}
 
     def handle_events(self, context, event):
@@ -83,17 +62,26 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         return False
 
     def modal(self, context, event):
-        # pass events to handler, if they're handled then don't passthrough
+        # pass events to buttons
         if self.handle_events(context, event):
             return {'RUNNING_MODAL'}
+
+        # kill it
+        if not context.scene.rigUI_active:
+            bpy.types.SpaceImageEditor.draw_handler_remove(self.draw_handle, 'WINDOW')
+            context.area.tag_redraw()
+            return {'FINISHED'}
+
         return {'PASS_THROUGH'}
 
     def execute(self, context):
         pass
 
-    def cancel(self, context):
-        self.unregister_handlers(context)
-
     def draw(self, context):
         pass
 
+def draw_callback_px(self, context):
+    # Draw everything
+    self.draw_background(context)
+    for b in self.buttons:
+        b.draw()

@@ -20,16 +20,17 @@ bl_info = {
 
 classes = {
     RIGUI_OT_OpenUI,
+    RIGUI_OT_CloseUI,
     VIEW3D_PT_RigUIPanel
 }
 
 
 def ui_icon(self, context):
-    if not bpy.context.scene.rigUI_active:
+    if not context.scene.rigUI_active:
         op = self.layout.operator("rigui.ui_draw", icon='MOD_ARMATURE', text='')
     else:
-        op = self.layout.operator("rigui.ui_draw", icon='MOD_ARMATURE', text='', depress=True)
-    # operator options here
+        op = self.layout.operator("rigui.ui_close", icon='MOD_ARMATURE', text='', depress=True)
+
 
 
 def register():
