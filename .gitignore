@@ -1,0 +1,7 @@
+# Don't track these folders
+
+.idea
+venv
+
+# Don't track files with these extensions (git has it's own compressions)
+*.zip
