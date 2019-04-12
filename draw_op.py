@@ -1,8 +1,5 @@
 """
-New operator definitions go in here
-    - Baking rig layout to JSON (Backlog?)
-    - Linking bones to buttons
-    - Anything else that's a blender op
+Main Modal operator
 """
 
 import bpy
@@ -79,6 +76,10 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
 
     def handle_events(self, context, event):
         # nothing to handle yet
+        for button in self.buttons:
+            if button.handle_event(context, event):
+                return True
+
         return False
 
     def modal(self, context, event):

@@ -1,8 +1,7 @@
 """
 Register other operators:
-    - Panel ops (adding buttons etc.)
-    - Selecting groups of bones
-    - Updating sliders etc.
+    / Editing UI
+    / Button functions not included in bpy.ops
 """
 
 import bpy

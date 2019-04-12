@@ -1,6 +1,6 @@
 """
 Starting point for full code refactor
-This is a work in progress.
+This is a work in progress
 """
 
 from .draw_op import *
@@ -19,7 +19,8 @@ bl_info = {
 }
 
 classes = {
-    RIGUI_OT_OpenUI
+    RIGUI_OT_OpenUI,
+    VIEW3D_PT_RigUIPanel
 }
 
 

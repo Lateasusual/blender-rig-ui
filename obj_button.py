@@ -15,3 +15,10 @@ class RigUIButton:
         self.x = 0
         self.y = 0
         # etc
+
+    def draw(self):
+        pass
+
+    def handle_event(self, event):
+        # Button presses etc, True if action is valid e.g. button was pressed
+        return False

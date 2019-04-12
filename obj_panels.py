@@ -1,5 +1,6 @@
 """
 Blender UI Panels associated with the addon
+For editing the UI etc.
 """
 
 import bpy
