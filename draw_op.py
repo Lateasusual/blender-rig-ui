@@ -9,19 +9,24 @@ import gpu
 from gpu_extras.batch import batch_for_shader
 from .obj_button import *
 
+
 class RIGUI_OT_OpenUI(bpy.types.Operator):
     """ Draw the UI, modal operator """
     bl_idname = "rigui.ui_draw"
     bl_label = "Open RigUI"
-    bl_options= {'REGISTER'}
+    bl_options = {'REGISTER'}
 
     def __init__(self):
         # buttons are defined here for now, define add_button etc.
 
-        button1 = RigUIButton(bpy.context)
-        self.buttons = {
-            button1
-        }
+        self.buttons = []
+
+    def load_buttons(self, dict):
+        self.buttons.clear()
+        for obj in dict.get('buttons'):
+            button = RigUIButton()
+            button.get_properties(obj)
+            self.buttons.append(button)
 
     def draw_background(self, context):
         w = context.area.width
@@ -39,12 +44,11 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         background_indices = ((0, 1, 2), (0, 2, 3))
         background_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
         background_batch = batch_for_shader(background_shader, 'TRIS',
-                                                 {"pos": background_verts}, indices=background_indices)
+                                            {"pos": background_verts}, indices=background_indices)
         background_shader.bind()
         background_shader.uniform_float("color", (0.2, 0.2, 0.2, 1))
 
         background_batch.draw(background_shader)
-
 
     def draw_image(self, context):
         w = 500
@@ -66,20 +70,28 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
 
         img_shader = gpu.shader.from_builtin('2D_IMAGE')
         img_batch = batch_for_shader(img_shader, 'TRI_FAN',
-                                                 {"pos": img_verts,
-                                                  "texCoord": ((0, 1), (0, 0), (1, 0), (1, 1))},)
+                                     {"pos": img_verts,
+                                      "texCoord": ((0, 1), (0, 0), (1, 0), (1, 1))}, )
         img_shader.bind()
         img_shader.uniform_int("image", 0)
         img_batch.draw(img_shader)
 
-
-
     def invoke(self, context, event):
-        self.draw_handle = bpy.types.SpaceImageEditor.draw_handler_add(self.draw_callback_px, (self, context), 'WINDOW', 'POST_PIXEL')
+        self.draw_handle = bpy.types.SpaceImageEditor.draw_handler_add(self.draw_callback_px, (self, context), 'WINDOW',
+                                                                       'POST_PIXEL')
         context.window_manager.modal_handler_add(self)
-
         context.scene.rigUI_active = True
-        context.area.tag_redraw() # update image editor view
+        context.area.tag_redraw()  # update image editor view
+
+        buttonlist = {
+            "buttons": [
+                {
+                    "color": (0.5, 0.5, 0.8, 1)
+                }
+            ]
+        }
+
+        self.load_buttons(buttonlist)
         return {"RUNNING_MODAL"}
 
     def handle_events(self, context, event):
@@ -113,6 +125,6 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
     def draw_callback_px(self, op, context):
         # Draw everything
         self.draw_background(context)
-        self.draw_image(context)
-        for b in self.buttons:
-            b.draw()
+        # Get buttons from dict, so we only need to reload the dict to re-get the buttons :D
+        for button in self.buttons:
+            button.draw()

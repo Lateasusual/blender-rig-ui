@@ -5,6 +5,7 @@ For editing the UI etc.
 
 import bpy
 
+
 class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
     bl_label = "RigUI"
     bl_idname = "VIEW3D_RigUI_Panel"

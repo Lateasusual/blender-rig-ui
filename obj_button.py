@@ -13,8 +13,9 @@ from gpu_extras.batch import batch_for_shader
 from mathutils.geometry import intersect_point_tri_2d
 from mathutils import Vector
 
+
 class RigUIButton():
-    def __init__(self, context):
+    def __init__(self):
         """ Button initialisation and attributes here """
         # Shape attributes
         self.vertices = ((0, 0), (0, 100), (100, 100), (100, 0))
@@ -23,7 +24,26 @@ class RigUIButton():
         self.color = (0.8, 0.8, 0.2, 1)
         self.shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
         self.batch = batch_for_shader(self.shader, 'TRIS', {"pos": self.vertices}, indices=self.indices)
-        self.context = context
+
+    def set_vertices(self, vertices):
+        self.vertices = vertices
+
+    def set_indices(self, indices):
+        self.indices = indices
+
+    def set_color(self, color):
+        self.color = color
+
+    def get_properties(self, dictionary: dict):
+        refs = {
+            "verts": self.set_vertices,
+            "indices": self.set_indices,
+            "color": self.set_color
+        }
+        for key in dictionary.keys():
+            val = dictionary[key]
+            func = refs.get(key, lambda: None)
+            func(val)
 
     def draw(self):
         self.shader.bind()

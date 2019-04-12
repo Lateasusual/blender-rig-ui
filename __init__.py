@@ -32,7 +32,6 @@ def ui_icon(self, context):
         op = self.layout.operator("rigui.ui_close", icon='MOD_ARMATURE', text='', depress=True)
 
 
-
 def register():
     for c in classes:
         bpy.utils.register_class(c)
@@ -50,6 +49,7 @@ def unregister():
 
     # Property removals, maybe don't bother since we'll need to restart after unregistering anyway
     del bpy.types.Scene.rigUI_active
+
 
 if __name__ == '__main__':
     register()
