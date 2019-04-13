@@ -6,21 +6,16 @@ Register other operators:
 
 import bpy
 from . functions_mesh import *
+from . functions_json import *
 
 class RIGUI_OT_AddButton(bpy.types.Operator):
     bl_idname = "rigui.add_button"
-    bl_label = "Add Button"
+    bl_label = "Add object to UI"
     bl_options = {'REGISTER'}
-
-    def __init__(self):
-        pass
 
     def execute(self, context):
         obj = bpy.data.objects['Cube']
-        verts, indcs, loops = get_mesh(obj)
-        print(verts)
-        print(indcs)
-        print(loops)
+        json_add_button_obj("Text", obj)
         return {'FINISHED'}
 
 

@@ -5,6 +5,7 @@ TODO Implement validity checker / highlighter for users
 
 import bpy
 import json
+from . obj_button import RigUIButton
 
 default_dict = {
     "rig_name": "",
@@ -37,9 +38,18 @@ def write_json(dict, text_key):
     text.write(json.dumps(dict))
 
 
-def build_dict_buttons(buttons, dictionary=None):
-    if dictionary is None:
-        dictionary = default_dict
-    for button in buttons:
-        dictionary["buttons"].append(button.to_dict())
-    return dictionary
+def build_dict_blank():
+    return default_dict[:]
+
+
+""" Functions for single-block editing of JSON - Don't use these for UI loading """
+
+
+def json_add_button_obj(text_key, shape_obj):
+    """ convert object properties to button properties """
+    dictionary = get_json_dict(text_key)
+
+    button = RigUIButton()
+    button.load_shape_from_obj(shape_obj.name)
+    button.set_offset([shape_obj.location[0], shape_obj.location[1]])
+    dictionary["buttons"].append(button.to_dict())

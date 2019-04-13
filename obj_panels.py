@@ -8,7 +8,7 @@ import bpy
 
 class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
     bl_label = "RigUI"
-    bl_idname = "VIEW3D_RigUI_Panel"
+    bl_idname = "VIEW3D_PT_RigUI_Panel"
 
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -20,6 +20,6 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         row = layout.row()
-        label = row.label(text="blank panel for RigUI tools")
+        label = row.label(text="RigUI tools")
         row = layout.row()
         row.operator("rigui.add_button")

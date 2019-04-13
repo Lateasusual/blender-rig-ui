@@ -41,11 +41,12 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
     def handle_events(self, context, event):
-        # nothing to handle yet
+        # handle buttons
         for button in self.buttons:
             if button.handle_event(context, event):
                 return True
-
+        # if we're not over a button do a selection box
+        # TODO add box select
         return False
 
     def modal(self, context, event):
