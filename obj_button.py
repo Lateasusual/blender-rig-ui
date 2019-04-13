@@ -14,16 +14,35 @@ from mathutils.geometry import intersect_point_tri_2d
 from mathutils import Vector
 
 
+def scale_verts(verts, scale):
+    scaled_verts = []
+    for vert in verts:
+        scaled_verts.append(Vector((vert[0] * scale[0], vert[1] * scale[1])))
+    return scaled_verts
+
+
+def offset_verts(verts, offset):
+    offset_verts = []
+    for vert in verts:
+        offset_verts.append(Vector((vert[0] + offset[0], vert[1] + offset[1])))
+    return offset_verts
+
+
 class RigUIButton():
     def __init__(self):
         """ Button initialisation and attributes here """
         # Shape attributes
-        self.vertices = ((0, 0), (0, 100), (100, 100), (100, 0))
+        self.vertices = ((0, 0), (0, 1), (1, 1), (1, 0))
         self.indices = ((0, 1, 2), (0, 2, 3))
-        self.scale = (100, 100)
+
+        self.scale = (100, 200)
+        self.offset = (100, 100)
+        self.vertices_scaled = scale_verts(self.vertices, self.scale)
+        self.vertices_offset = offset_verts(self.vertices_scaled, self.offset)
+
         self.color = (0.8, 0.8, 0.2, 1)
         self.shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
-        self.batch = batch_for_shader(self.shader, 'TRIS', {"pos": self.vertices}, indices=self.indices)
+        self.batch = batch_for_shader(self.shader, 'TRIS', {"pos": self.vertices_offset}, indices=self.indices)
 
     def set_vertices(self, vertices):
         self.vertices = vertices
@@ -31,13 +50,30 @@ class RigUIButton():
     def set_indices(self, indices):
         self.indices = indices
 
+    def set_scale(self, scale):
+        self.scale = scale
+
+    def set_offset(self, offset):
+        self.offset = offset
+
     def set_color(self, color):
         self.color = color
+
+    def to_dict(self):
+        return {
+            "verts": self.vertices,
+            "indices": self.indices,
+            "scale": self.scale,
+            "offset": self.offset,
+            "color": self.color
+        }
 
     def get_properties(self, dictionary: dict):
         refs = {
             "verts": self.set_vertices,
             "indices": self.set_indices,
+            "scale": self.set_scale,
+            "offset": self.set_offset,
             "color": self.set_color
         }
         for key in dictionary.keys():
@@ -68,7 +104,7 @@ class RigUIButton():
 
     def is_in_shape(self, x, y):
         tri_indices = self.indices
-        verts = self.vertices
+        verts = self.vertices_offset
         # x, y = bpy.types.View2D.view_to_region(x, y, clip=True)
 
         for tri in tri_indices:

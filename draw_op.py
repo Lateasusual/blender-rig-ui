@@ -7,8 +7,8 @@ import bgl
 import gpu
 
 from gpu_extras.batch import batch_for_shader
-from .obj_button import *
-
+from . obj_button import *
+from . functions_json import *
 
 class RIGUI_OT_OpenUI(bpy.types.Operator):
     """ Draw the UI, modal operator """
@@ -62,7 +62,8 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             (w, h),
             (w, y)
         )
-        filepath = "C:/Users/Christopher/AppData/Roaming/Blender Foundation/Blender/2.80/scripts/addons/blender-rig-ui/img/test.jpg"
+        filepath = "C:/Users/Christopher/AppData/Roaming/Blender Foundation/" \
+                   "Blender/2.80/scripts/addons/blender-rig-ui/img/test.jpg"
         image = bpy.data.images.load(filepath, check_existing=True)
 
         bgl.glActiveTexture(bgl.GL_TEXTURE0)
@@ -83,15 +84,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         context.scene.rigUI_active = True
         context.area.tag_redraw()  # update image editor view
 
-        buttonlist = {
-            "buttons": [
-                {
-                    "color": (0.5, 0.5, 0.8, 1)
-                }
-            ]
-        }
-
-        self.load_buttons(buttonlist)
+        buttonlist = get_json_dict("Text")
+        if buttonlist is not None:
+            self.load_buttons(buttonlist)
         return {"RUNNING_MODAL"}
 
     def handle_events(self, context, event):
