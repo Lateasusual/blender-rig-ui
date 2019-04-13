@@ -26,14 +26,19 @@ def get_mesh(obj):
     vertices = []
     indices = []
 
-    for v in bm_loops[0]:
-        loop_vertices.append(v.co)
-
     for face in data.polygons:
         indices.append([face.vertices[0], face.vertices[1], face.vertices[2]])
 
     for vert in data.vertices:
         vertices.append(vert.co.xyz)
+
+    if len(bm_loops) != 0:
+        for v in bm_loops[0]:
+            loop_vertices.append(v.co)
+    else:
+        loop_vertices = vertices
+
+
 
     return vertices, indices, loop_vertices
 
