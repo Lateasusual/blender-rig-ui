@@ -21,3 +21,5 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
         layout = self.layout
         row = layout.row()
         label = row.label(text="blank panel for RigUI tools")
+        row = layout.row()
+        row.operator("rigui.add_button")

@@ -1,5 +1,6 @@
 """
 JSON text handler functions for saving and loading layouts
+TODO Implement validity checker / highlighter for users
 """
 
 import bpy
@@ -21,13 +22,20 @@ default_button = {
 
 def get_json_dict(text_key):
     """ Return a python dict of the text data """
-    if text_key in bpy.data.texts:
-        return json.loads(bpy.data.texts.get(text_key))
+    if bpy.data.texts.get(text_key) is not None:
+        try:
+            return json.loads(bpy.data.texts.get(text_key).as_string())
+        except Exception:
+            print("Error parsing JSON, check syntax")
+    else:
+        return None
+
 
 def write_json(dict, text_key):
     text = bpy.data.texts[text_key]
     text.clear()
     text.write(json.dumps(dict))
+
 
 def build_dict_buttons(buttons, dictionary=None):
     if dictionary is None:

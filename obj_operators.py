@@ -5,7 +5,7 @@ Register other operators:
 """
 
 import bpy
-
+from . functions_mesh import *
 
 class RIGUI_OT_AddButton(bpy.types.Operator):
     bl_idname = "rigui.add_button"
@@ -16,11 +16,18 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
         pass
 
     def execute(self, context):
-        pass
+        obj = bpy.data.objects['Cube']
+        verts, indcs, loops = get_mesh(obj)
+        print(verts)
+        print(indcs)
+        print(loops)
+        return {'FINISHED'}
 
 
 class RIGUI_OT_CloseUI(bpy.types.Operator):
+    """ Closes RigUI """
     bl_idname = "rigui.ui_close"
+    bl_description = "Close RigUI"
     bl_label = "Close UI"
     bl_options = {'REGISTER'}
 

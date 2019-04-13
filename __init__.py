@@ -21,6 +21,7 @@ bl_info = {
 classes = {
     RIGUI_OT_OpenUI,
     RIGUI_OT_CloseUI,
+    RIGUI_OT_AddButton,
     VIEW3D_PT_RigUIPanel
 }
 

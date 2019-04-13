@@ -12,6 +12,7 @@ import bgl
 from gpu_extras.batch import batch_for_shader
 from mathutils.geometry import intersect_point_tri_2d
 from mathutils import Vector
+from enum import Enum
 
 
 def scale_verts(verts, scale):
@@ -28,12 +29,20 @@ def offset_verts(verts, offset):
     return offset_verts
 
 
+class button_state(Enum):
+    default = 0
+    hovered = 1
+    pressed = 2
+    selected = 3
+
+
 class RigUIButton():
     def __init__(self):
         """ Button initialisation and attributes here """
         # Shape attributes
-        self.vertices = ((0, 0), (0, 1), (1, 1), (1, 0))
-        self.indices = ((0, 1, 2), (0, 2, 3))
+        self.vertices = [(0, 0), (0, 1), (1, 1), (1, 0)]
+        self.indices = [(0, 1, 2), (0, 2, 3)]
+        self.indices_lines = [(0, 1), (1, 2), (2, 3), (3, 0)]
 
         self.scale = (100, 200)
         self.offset = (100, 100)
@@ -41,8 +50,11 @@ class RigUIButton():
         self.vertices_offset = offset_verts(self.vertices_scaled, self.offset)
 
         self.color = (0.8, 0.8, 0.2, 1)
+        self.state = button_state.default
+
         self.shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
         self.batch = batch_for_shader(self.shader, 'TRIS', {"pos": self.vertices_offset}, indices=self.indices)
+        self.batch_lines = batch_for_shader(self.shader, 'LINES', {"pos": self.vertices_offset}, indices=self.indices_lines)
 
     def set_vertices(self, vertices):
         self.vertices = vertices
@@ -83,24 +95,33 @@ class RigUIButton():
 
     def draw(self):
         self.shader.bind()
-        self.shader.uniform_float("color", self.color)
+        color = (0.3, 0.3, 0.3, 1)
 
-        bgl.glEnable(bgl.GL_BLEND)
+        if self.state is button_state.hovered: color = (0.8, 0.2, 0.2, 1)
+
+        # draw background
+        self.shader.uniform_float("color", color)
         self.batch.draw(self.shader)
-        bgl.glDisable(bgl.GL_BLEND)
+
+        # draw lines
+        color = self.color
+        self.shader.uniform_float("color", color)
+        self.batch_lines.draw(self.shader)
 
     def handle_event(self, context, event):
         # Button presses etc, True if action is valid e.g. button was pressed
+        ret = False
         if event.type == 'MOUSEMOVE':
             if self.is_in_shape(event.mouse_region_x, event.mouse_region_y):
+                self.state = button_state.hovered
                 # Run this op if left mouse pressed and valid
-                self.color = (1, 0.2, 0.2, 1)
-                context.area.tag_redraw()
-                return True
-        else:
-            self.color = (0.8, 0.8, 0.2, 1)
-            context.area.tag_redraw()
-        return False
+                # do nothing just yet
+                ret = True
+            else:
+                if self.state is button_state.hovered:
+                    self.state = button_state.default
+        context.area.tag_redraw()
+        return ret
 
     def is_in_shape(self, x, y):
         tri_indices = self.indices
