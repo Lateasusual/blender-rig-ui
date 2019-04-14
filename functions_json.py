@@ -1,6 +1,5 @@
 """
 JSON text handler functions for saving and loading layouts
-TODO set use_mesh_shapes so we can pack the JSON without everything else
 """
 
 import bpy
