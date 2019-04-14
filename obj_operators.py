@@ -8,16 +8,26 @@ import bpy
 from . functions_json import *
 
 
+def get_collection(name):
+    bpy.context.view_layer.active_layer_collection = bpy.context.view_layer.layer_collection
+
+    if name not in bpy.context.scene.collection.children.keys():
+        col = bpy.collections.new(name)
+        bpy.context.scene.collection.children.link(col)
+    else:
+        col = bpy.data.collections[name]
+
+    return col
+
+
 class RIGUI_OT_AddButton(bpy.types.Operator):
     bl_idname = "rigui.add_button"
     bl_label = "Build UI"
     bl_options = {'REGISTER'}
 
-    # TODO implement bone selection
-    # bone = bpy.props.StringProperty("Bone")
-
     canvas_collection = bpy.props.StringProperty("collection")
     layout_text = bpy.props.StringProperty("text")
+    canvas_object = bpy.props.StringProperty("root object")
 
     def execute(self, context):
         col = bpy.data.collections[self.canvas_collection]
@@ -25,8 +35,7 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
         clear_json(self.layout_text)
         for obj in col.all_objects:
             if obj.type == "MESH":
-                button = json_add_button_obj(self.layout_text, obj, color=obj.color, bone=obj.rigUI_linked_bone)
-                button.use_shape = False
+                button = json_add_button_obj(self.layout_text, obj, color=obj.color, bone=obj.rigUI_linked_bone, offset_obj_key=self.canvas_object)
         context.scene["rigUI_tag_reload"] = True
         return {'FINISHED'}
 
@@ -39,9 +48,32 @@ class RIGUI_OT_CloseUI(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return True
 
     def execute(self, context):
         context.scene.rigUI_active = False
         return {'FINISHED'}
+
+
+class RIGUI_OT_CreateCanvas(bpy.types.Operator):
+    """ Creates a new text datablock, and a new empty collection to put objects in """
+    bl_idname = "rigui.create_canvas"
+    bl_description = "Create new Canvas"
+    bl_label = "New UI canvas"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    new_ui_name = bpy.props.StringProperty(name="Layout name", default="RIGUI_Layout")
+    new_ui_canvas = bpy.props.StringProperty(name="Canvas Collection", default="Collection")
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        text = bpy.data.texts.new(self.new_ui_name)
+        canvas = get_collection(self.new_ui_canvas)
+        context.scene.rigUI_collection = self.new_ui_canvas
+        context.scene.rigUI_build_text_name = self.new_ui_name
+        return {'FINISHED'}
+

@@ -26,12 +26,17 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
         row.prop_search(context.scene, "rigUI_collection", bpy.data, "collections")
         row = layout.row()
         row.prop_search(context.scene, "rigUI_build_text_name", bpy.data, "texts")
-
+        row = layout.row()
+        row.prop_search(context.scene, "rigUI_canvas_object", bpy.data, "objects")
 
         row = layout.row()
+        row.scale_y = 2
         op = row.operator("rigui.add_button")
-        row = layout.row()
         op.layout_text = context.scene.rigUI_build_text_name
+        op.canvas_collection = context.scene.rigUI_collection
+        op.canvas_object = context.scene.rigUI_canvas_object
+        row = layout.row()
+        op = row.operator("rigui.create_canvas")
 
         if context.active_object.type == "MESH":
             row = layout.row()
@@ -44,7 +49,6 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
             row = layout.row()
             row.prop(context.active_object, "color")
 
-        op.canvas_collection = context.scene.rigUI_collection
         if context.active_object.type == "ARMATURE":
             row = layout.row()
             row.label(text="Rig Settings")

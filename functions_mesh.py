@@ -8,7 +8,7 @@ import bmesh
 from bpy_extras import mesh_utils
 
 
-def get_mesh(obj):
+def get_mesh(obj, offset_obj=None):
     data = obj.data
 
     bm = bmesh.new()
@@ -26,7 +26,10 @@ def get_mesh(obj):
     indices = []
 
     # apply object matrix, then reset it
-    mat = obj.matrix_world
+    if offset_obj is not None:
+        mat = offset_obj.matrix_world.inverted() @ obj.matrix_world
+    else:
+        mat = obj.matrix_world
 
     for face in data.polygons:
         indices.append([face.vertices[0], face.vertices[1], face.vertices[2]])
@@ -40,8 +43,6 @@ def get_mesh(obj):
             loop_vertices.append(v.co @ mat.transposed())
     else:
         loop_vertices = vertices
-
-
 
     return vertices, indices, loop_vertices
 

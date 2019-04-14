@@ -66,7 +66,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         if event.type == "TIMER":
             bpy.context.scene["rigUI_tag_reload"] = True
         if event.type in {"ESC"}:
-            bpy.context.scene["rigUI_tag_reload"] = True
+            bpy.context.scene.rigUI_active = False
         # handle buttons
         for button in self.buttons:
             if button.handle_event(context, event):
@@ -79,7 +79,6 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         # pass events to buttons
         if event.type == "TIMER":
             # self.draw_callback_px(self, context) # CRASHES! >_< (probably wrong context but we can't fix that)
-
             return {'PASS_THROUGH'}
         if self.handle_events(context, event):
             return {'RUNNING_MODAL'}
@@ -117,5 +116,12 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         # Draw everything
         draw_background(context)
         # Cached buttons, not loading from dict or json every time
+
+        width = context.area.width
+        height = context.area.height
+
+
         for button in self.buttons:
+            button.set_offset([width/2, height/2])
+            button.update_shader()
             button.draw()

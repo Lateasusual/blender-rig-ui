@@ -110,7 +110,7 @@ class RigUIButton:
     def set_use_shape(self, state):
         self.use_shape = state
 
-    def load_shape_from_obj(self, obj_name):
+    def load_shape_from_obj(self, obj_name, offset_obj=None):
         # Tagged not to load from bpy, use cached JSON instead
         if not self.use_shape:
             return
@@ -120,7 +120,7 @@ class RigUIButton:
             return
         obj = bpy.data.objects[obj_name]
 
-        verts, indices, loop_verts = get_mesh(obj)
+        verts, indices, loop_verts = get_mesh(obj, offset_obj)
         self.vertices = verts
         self.indices = indices
         if loop_verts is None or len(loop_verts) == 0:
@@ -181,7 +181,6 @@ class RigUIButton:
                 pass
             elif self.state == button_state.selected:
                 self.state = button_state.default
-
         self.shader.bind()
         color = (0.3, 0.3, 0.3, 1)
 
