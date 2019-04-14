@@ -12,7 +12,7 @@ def get_collection(name):
     bpy.context.view_layer.active_layer_collection = bpy.context.view_layer.layer_collection
 
     if name not in bpy.context.scene.collection.children.keys():
-        col = bpy.collections.new(name)
+        col = bpy.data.collections.new(name)
         bpy.context.scene.collection.children.link(col)
     else:
         col = bpy.data.collections[name]

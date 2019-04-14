@@ -21,6 +21,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.buttons = []
         self.active_object = None
         self.text_key = None
+        self.scale_mod = 1
 
     def load_buttons(self, dict):
         """ Load buttons from mesh, if use_mesh_shapes is enabled """
@@ -65,6 +66,11 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         # check for object selection changes
         if event.type == "TIMER":
             bpy.context.scene["rigUI_tag_reload"] = True
+        if event.type == "WHEELUPMOUSE":
+            self.scale_mod -= 0.1
+        if event.type == "WHEELDOWNMOUSE":
+            self.scale_mod += 0.1
+
         if event.type in {"ESC"}:
             bpy.context.scene.rigUI_active = False
         # handle buttons
@@ -122,6 +128,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
 
 
         for button in self.buttons:
-            button.set_offset([width/2, height/2])
+            button.set_offset([width / 2, height / 2])
+            button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
             button.update_shader()
             button.draw()
