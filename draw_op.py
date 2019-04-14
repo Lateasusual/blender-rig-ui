@@ -8,6 +8,12 @@ from .obj_button import *
 from .functions_json import *
 from .functions_gpu import *
 
+def is_mouse_in_area(context, event):
+    width = context.area.width
+    height = context.area.height
+    x = event.mouse_region_x
+    y = event.mouse_region_y
+    return 0 < x < width and 0 < y < height
 
 class RIGUI_OT_OpenUI(bpy.types.Operator):
     """ Opens RigUI in the Image Editor"""
@@ -22,6 +28,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.active_object = None
         self.text_key = None
         self.scale_mod = 1
+        self.transform_mod = [0, 0]
+        self.transform_start = [0, 0]
+        self.is_moving = False
 
     def load_buttons(self, dict):
         """ Load buttons from mesh, if use_mesh_shapes is enabled """
@@ -67,9 +76,22 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         if event.type == "TIMER":
             bpy.context.scene["rigUI_tag_reload"] = True
         if event.type == "WHEELUPMOUSE":
-            self.scale_mod -= 0.1
+            if is_mouse_in_area(context, event):
+                self.scale_mod += 0.1
         if event.type == "WHEELDOWNMOUSE":
-            self.scale_mod += 0.1
+            if is_mouse_in_area(context, event):
+                self.scale_mod -= 0.1
+
+        if event.type == "MOUSEMOVE" and event.ctrl and is_mouse_in_area(context, event):
+            x = context.area.width - event.mouse_region_x
+            y = context.area.height - event.mouse_region_y
+            if not self.is_moving:
+                self.is_moving = True
+                self.transform_start = [x + self.transform_mod[0], y + self.transform_mod[1]]
+            else:
+                self.transform_mod = [self.transform_start[0] - x, self.transform_start[1] - y]
+        else:
+            self.is_moving = False
 
         if event.type in {"ESC"}:
             bpy.context.scene.rigUI_active = False
@@ -128,7 +150,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
 
 
         for button in self.buttons:
-            button.set_offset([width / 2, height / 2])
+            button.set_offset([width / 2 + self.transform_mod[0], height / 2 + self.transform_mod[1]])
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
             button.update_shader()
             button.draw()
