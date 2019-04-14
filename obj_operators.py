@@ -17,15 +17,15 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
     # bone = bpy.props.StringProperty("Bone")
 
     canvas_collection = bpy.props.StringProperty("collection")
+    layout_text = bpy.props.StringProperty("text")
 
     def execute(self, context):
         col = bpy.data.collections[self.canvas_collection]
         bpy.ops.object.mode_set(mode="OBJECT")
-        clear_json("Text")
+        clear_json(self.layout_text)
         for obj in col.all_objects:
             if obj.type == "MESH":
-
-                button = json_add_button_obj("Text", obj)
+                button = json_add_button_obj(self.layout_text, obj, color=obj.color, bone=obj.rigUI_linked_bone)
                 button.use_shape = False
         context.scene["rigUI_tag_reload"] = True
         return {'FINISHED'}

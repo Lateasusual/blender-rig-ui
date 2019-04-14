@@ -53,12 +53,13 @@ class RigUIButton:
         self.indices = [(0, 1, 2), (0, 2, 3)]
         self.indices_lines = [(0, 1), (1, 2), (2, 3), (3, 0)]
 
-        self.scale = (100, 100)
-        self.offset = (20, 20) # Border buffer / maybe use for zoom?
+        self.scale = (100, 100)  # maybe use for zoom, currently converting 1m to 100px
+        self.offset = (0, 0)  # maybe use for zoom
 
         self.color = (0.8, 0.8, 0.2, 1)
         self.state = button_state.default
 
+        self.linked_bone = ""
         self.use_shape = True
         self.shape_object_name = ""
         self.shader = None
@@ -91,11 +92,14 @@ class RigUIButton:
     def set_offset(self, offset):
         self.offset = offset
 
-    def set_color(self, color):
-        self.color = color
+    def set_linked_bone(self, bone):
+        self.linked_bone = bone
 
-    def mouse_down(self, event):
-        pass
+    def set_color(self, color):
+        colours = []
+        for c in color:
+            colours.append(c)
+        self.color = colours
 
     def set_outline_vertices(self, vertices):
         self.vertices_lines = vertices
@@ -134,6 +138,7 @@ class RigUIButton:
 
     def to_dict(self):
         return {
+            "use_shape": self.use_shape,
             "verts": vertex_to_float_array(self.vertices),
             "indices": self.indices,
             "outline_verts": vertex_to_float_array(self.vertices_lines),
@@ -142,7 +147,7 @@ class RigUIButton:
             "scale": self.scale,
             "offset": self.offset,
             "color": self.color,
-            "use_shape": self.use_shape
+            "bone": self.linked_bone
         }
 
     def get_properties(self, dictionary: dict):
@@ -155,7 +160,8 @@ class RigUIButton:
             "offset": self.set_offset,
             "color": self.set_color,
             "object": self.load_shape_from_obj,
-            "use_shape": self.set_use_shape
+            "use_shape": self.set_use_shape,
+            "bone": self.set_linked_bone
         }
         for key in dictionary.keys():
             val = dictionary[key]
@@ -165,11 +171,25 @@ class RigUIButton:
         self.update_shader()
 
     def draw(self):
+        if bpy.context.active_object.type == "ARMATURE":
+            if self.linked_bone not in bpy.context.active_object.data.bones:
+                return  # don't draw if there's nothing to draw :D
+            bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
+            if bone_selected:
+                self.state = button_state.selected
+            elif self.state == button_state.hovered:
+                pass
+            elif self.state == button_state.selected:
+                self.state = button_state.default
+
         self.shader.bind()
         color = (0.3, 0.3, 0.3, 1)
 
         if self.state is button_state.hovered:
             color = (0.5, 0.5, 0.5, 1)
+        elif self.state is button_state.selected:
+            color = (0.4, 0.4, 0.4, 1)
+
 
         # draw background
         self.shader.uniform_float("color", color)
@@ -179,18 +199,40 @@ class RigUIButton:
         self.shader.uniform_float("color", self.color)
         self.batch_lines.draw(self.shader)
 
+    def select_button(self, shift=False):
+        if bpy.context.active_object.type == "ARMATURE":
+            if self.linked_bone not in bpy.context.active_object.data.bones:
+                return
+            bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
+            bpy.ops.object.mode_set(mode='POSE')
+            if shift:
+                bpy.context.active_object.data.bones[self.linked_bone].select = not bone_selected
+                if bone_selected:
+                    self.state = button_state.selected
+                else:
+                    self.state = button_state.hovered
+            else:
+                bpy.ops.pose.select_all(action='DESELECT')
+                bpy.context.active_object.data.bones[self.linked_bone].select = True
+                self.state = button_state.selected
+
+
     def handle_event(self, context, event):
         # Button presses etc, True if action is valid e.g. button was pressed
         ret = False
+        if event.type == "LEFTMOUSE":
+            if event.value == 'PRESS' and self.is_in_shape(event.mouse_region_x, event.mouse_region_y):
+                self.select_button(shift=event.shift)
+
         if event.type == 'MOUSEMOVE':
             if self.is_in_shape(event.mouse_region_x, event.mouse_region_y):
-                self.state = button_state.hovered
+                if not self.state == button_state.selected:
+                    self.state = button_state.hovered
                 # Run this op if left mouse pressed and valid
                 # do nothing just yet
-                self.mouse_down(event)
                 ret = True
             else:
-                if self.state is button_state.hovered:
+                if self.state is button_state.hovered and not self.state is button_state.selected:
                     self.state = button_state.default
         context.area.tag_redraw()
         return ret

@@ -22,13 +22,17 @@ default_button = {
 }
 
 
-def get_json_dict(text_key):
+def get_json_dict(text_key, create_new=False):
     """ Return a python dict of the text data """
-    if bpy.data.texts.get(text_key) is not None:
+    if text_key in bpy.data.texts:
         try:
             return json.loads(bpy.data.texts.get(text_key).as_string())
         except Exception:
             print("Error parsing JSON, check syntax")
+    elif create_new:
+        bpy.data.texts.new(text_key)
+        clear_json(text_key)
+        return get_json_dict(text_key)
     else:
         return None
 
@@ -36,19 +40,18 @@ def get_json_dict(text_key):
 def write_json(dict, text_key):
     text = bpy.data.texts[text_key]
     text.clear()
-    text.write(json.dumps(dict, indent=2))
+    text.write(json.dumps(dict))  # No need to be neat
 
 
 def clear_json(text_key):
+    if text_key not in bpy.data.texts:
+        bpy.data.texts.new(text_key)
     text = bpy.data.texts[text_key]
     text.clear()
     text.write(json.dumps(default_dict))
 
 
-""" Functions for single-block editing of JSON - Don't use these for UI loading """
-
-
-def json_add_button_obj(text_key, shape_obj):
+def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="Bone"):
     """
      convert object properties to button properties
      TODO - Add object properties as arguments
@@ -61,8 +64,13 @@ def json_add_button_obj(text_key, shape_obj):
      """
     dictionary = get_json_dict(text_key)
     button = RigUIButton()
+    """ Set button properties from object data here """
+    button.set_color(color)
+    button.set_linked_bone(bone)
     button.load_shape_from_obj(shape_obj.name)
-    button.set_offset([0, 0])
+    button.set_use_shape(False)
+
+
     dictionary["buttons"].append(button.to_dict())
     write_json(dictionary, text_key)
     return button  # just in case we want to keep it
