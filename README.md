@@ -30,4 +30,5 @@ Still not quite as smooth as it ought to be...
 # TODO
   - Zoom, currently UI is static size and offset from 0,0 in the bottom left
   - Literally every feature i want to add lol
+  - Add canvas offset object, so UI layout doesn't have to be centred on origin while creating it
   - More as they come :)
