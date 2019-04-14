@@ -9,7 +9,7 @@ from .obj_panels import *
 import bpy
 
 bl_info = {
-    "name": "blender-rigui",
+    "name": "blender-rig-ui",
     "description": "Editable UI interface for rig animation",
     "author": "Lateasusual",
     "version": (0, 1, 0),

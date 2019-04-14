@@ -106,6 +106,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         if self.text_key != context.active_object.rigUI_ui_name:
             self.text_key = context.active_object.rigUI_ui_name
             self.reload_layout()
+        elif context.active_object is None:
+            draw_background()
+            return
         # If we're tagged to reload object positions etc.
         if bpy.context.scene["rigUI_tag_reload"]:
             self.reload_layout()
