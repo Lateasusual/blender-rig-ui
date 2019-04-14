@@ -8,7 +8,7 @@ Thanks for dropping by :)
 Download as ZIP, then in Blender:
   Edit -> Preferences -> Add-ons -> Install... -> select blender-rig-ui.zip
   
-# This is a lie, you'll need to rename it to RigUI_new for now, next update will need a reinstall since i'll rename the properties to work first time :)
+If it doesn't work check the addon folder in `Appdata/Roaming/Blender Foundation/2.80/scripts/addons` is called `blender-rigui` (latest release)
   
 # Usage
 Still not quite as smooth as it ought to be...
