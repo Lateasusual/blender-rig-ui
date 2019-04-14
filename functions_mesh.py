@@ -10,13 +10,12 @@ from bpy_extras import mesh_utils
 
 def get_mesh(obj):
     data = obj.data
+
     bm = bmesh.new()
     bm.from_mesh(data)
-
-    # Use these if we want clean meshes, otherwise don't bother
-
-    # bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=0.002)
-    # bmesh.ops.dissolve_limit(bm, angle_limit=0.001745, verts=bm.verts, edges=bm.edges)
+    # clean the mesh
+    bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method='BEAUTY', ngon_method='BEAUTY')
+    bm.to_mesh(data)
 
     vertex_count = [v.index for v in bm.verts]
     bm_loops = border_loops(bm, 0, [], vertex_count)
@@ -26,15 +25,19 @@ def get_mesh(obj):
     vertices = []
     indices = []
 
+    # apply object matrix, then reset it
+    mat = obj.matrix_world
+
     for face in data.polygons:
         indices.append([face.vertices[0], face.vertices[1], face.vertices[2]])
 
     for vert in data.vertices:
-        vertices.append(vert.co.xyz)
+        # multiply for rotation etc
+        vertices.append(vert.co.xyz @ mat.transposed())
 
     if len(bm_loops) != 0:
         for v in bm_loops[0]:
-            loop_vertices.append(v.co)
+            loop_vertices.append(v.co @ mat.transposed())
     else:
         loop_vertices = vertices
 

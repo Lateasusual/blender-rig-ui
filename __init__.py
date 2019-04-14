@@ -38,7 +38,9 @@ def register():
         bpy.utils.register_class(c)
 
     # Property definitions
-    bpy.types.Scene.rigUI_active = bpy.props.BoolProperty(name="RigUI Active", default=False)
+    bpy.types.Scene.rigUI_active = bpy.props.BoolProperty(name="RigUI is Active", default=False)
+    bpy.types.Scene.rigUI_collection = bpy.props.StringProperty(name="Canvas Collection", default="None")
+    bpy.types.Scene.rigUI_tag_reload = bpy.props.BoolProperty(default=False)
 
     # Prepend for image header here
     bpy.types.IMAGE_HT_header.prepend(ui_icon)
@@ -50,6 +52,8 @@ def unregister():
 
     # Property removals, maybe don't bother since we'll need to restart after unregistering anyway
     del bpy.types.Scene.rigUI_active
+    del bpy.types.Scene.rigUI_collection
+    del bpy.types.Scene.rigUI_tag_reload
 
 
 if __name__ == '__main__':

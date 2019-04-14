@@ -5,17 +5,29 @@ Register other operators:
 """
 
 import bpy
-from . functions_mesh import *
 from . functions_json import *
+
 
 class RIGUI_OT_AddButton(bpy.types.Operator):
     bl_idname = "rigui.add_button"
-    bl_label = "Add object to UI"
+    bl_label = "Build UI"
     bl_options = {'REGISTER'}
 
+    # TODO implement bone selection
+    # bone = bpy.props.StringProperty("Bone")
+
+    canvas_collection = bpy.props.StringProperty("collection")
+
     def execute(self, context):
-        obj = bpy.data.objects['Cube']
-        json_add_button_obj("Text", obj)
+        col = bpy.data.collections[self.canvas_collection]
+        bpy.ops.object.mode_set(mode="OBJECT")
+        clear_json("Text")
+        for obj in col.all_objects:
+            if obj.type == "MESH":
+
+                button = json_add_button_obj("Text", obj)
+                button.use_shape = False
+        context.scene["rigUI_tag_reload"] = True
         return {'FINISHED'}
 
 

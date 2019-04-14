@@ -16,6 +16,13 @@ from enum import Enum
 from . functions_mesh import get_mesh
 
 
+def vertex_to_float_array(vertices):
+    out = []
+    for v in vertices:
+        out.append([v[0], v[1], v[2]])
+    return out
+
+
 def scale_verts(verts, scale):
     scaled_verts = []
     for vert in verts:
@@ -28,6 +35,7 @@ def offset_verts(verts, offset):
     for vert in verts:
         offset_verts.append(Vector((vert[0] + offset[0], vert[1] + offset[1])))
     return offset_verts
+
 
 class button_state(Enum):
     default = 0
@@ -51,6 +59,7 @@ class RigUIButton:
         self.color = (0.8, 0.8, 0.2, 1)
         self.state = button_state.default
 
+        self.use_shape = True
         self.shape_object_name = ""
         self.shader = None
         self.batch = None
@@ -94,7 +103,14 @@ class RigUIButton:
     def set_outline_indices(self, indices):
         self.indices_lines = indices
 
+    def set_use_shape(self, state):
+        self.use_shape = state
+
     def load_shape_from_obj(self, obj_name):
+        # Tagged not to load from bpy, use cached JSON instead
+        if not self.use_shape:
+            return
+
         self.shape_object_name = obj_name
         if obj_name not in bpy.data.objects:
             return
@@ -103,27 +119,30 @@ class RigUIButton:
         verts, indices, loop_verts = get_mesh(obj)
         self.vertices = verts
         self.indices = indices
+        if loop_verts is None or len(loop_verts) == 0:
+            return
         loop_indices = []
         for i, v in enumerate(loop_verts):
             if i < len(loop_verts) - 1:
                 loop_indices.append([i, i+1])
             else:
                 loop_indices.append([i, 0])
-        print(loop_indices)
+
         self.vertices_lines = loop_verts
         self.indices_lines = loop_indices
         self.update_shader()
 
     def to_dict(self):
         return {
-            "verts": self.vertices,
+            "verts": vertex_to_float_array(self.vertices),
             "indices": self.indices,
-            "outline_verts": self.vertices_lines,
+            "outline_verts": vertex_to_float_array(self.vertices_lines),
             "outline_indices": self.indices_lines,
             "object": self.shape_object_name,
             "scale": self.scale,
             "offset": self.offset,
-            "color": self.color
+            "color": self.color,
+            "use_shape": self.use_shape
         }
 
     def get_properties(self, dictionary: dict):
@@ -135,12 +154,15 @@ class RigUIButton:
             "scale": self.set_scale,
             "offset": self.set_offset,
             "color": self.set_color,
-            "object": self.load_shape_from_obj
+            "object": self.load_shape_from_obj,
+            "use_shape": self.set_use_shape
         }
         for key in dictionary.keys():
             val = dictionary[key]
             func = refs.get(key, lambda: None)
             func(val)
+        # refresh vertex position etc.
+        self.update_shader()
 
     def draw(self):
         self.shader.bind()
