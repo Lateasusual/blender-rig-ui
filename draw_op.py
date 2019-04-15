@@ -77,6 +77,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
     def handle_events(self, context, event):
+        if not is_mouse_in_area(context, event):
+            self.is_moving = False
+            return False
         # check for object selection changes
         if event.type == "TIMER":
             bpy.context.scene["rigUI_tag_reload"] = True
@@ -87,7 +90,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             if is_mouse_in_area(context, event):
                 self.scale_mod -= 0.1
 
-        if event.type == "MOUSEMOVE" and event.ctrl and is_mouse_in_area(context, event):
+        if event.type == "MOUSEMOVE" and event.ctrl:
             x = context.area.width - event.mouse_region_x
             y = context.area.height - event.mouse_region_y
             if not self.is_moving:
