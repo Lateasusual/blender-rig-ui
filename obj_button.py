@@ -46,6 +46,18 @@ def offset_verts(verts, offset):
     return offset_verts
 
 
+def is_triangle_in_rect(verts, x_range, y_range):
+    # if both are >= 1 then the triangle is within the range (must overlap)
+    x_overlap_counts = 0
+    y_overlap_counts = 0
+    for v in verts:
+        if x_range[0] < v[0] < x_range[1]:
+            x_overlap_counts += 1
+        if y_range[0] < v[1] < y_range[1]:
+            y_overlap_counts += 1
+    return x_overlap_counts > 0 and y_overlap_counts > 0
+
+
 class button_state(Enum):
     default = 0
     hovered = 1
@@ -68,6 +80,9 @@ class RigUIButton:
         self.color = (0.8, 0.8, 0.2, 1)
         self.state = button_state.default
 
+        self.parent_op = None
+        # Button function, e.g. bone to select bones, or tab for tabs etc. etc.
+        self.type = "bone"
         self.linked_bone = ""
         self.use_shape = True
         self.shape_object_name = ""
@@ -88,6 +103,16 @@ class RigUIButton:
         vertices_scaled = scale_verts(self.vertices, self.scale)
         vertices__lines_scaled = scale_verts(self.vertices_lines, self.scale)
         return offset_verts(vertices_scaled, self.offset), offset_verts(vertices__lines_scaled, self.offset)
+
+    def is_shape_in_rect(self, x_range, y_range):
+        for triple in self.indices:
+            triangle = [self.vertices[triple[0]], self.vertices[triple[1]], self.vertices[triple[2]]]
+            if is_triangle_in_rect(triangle, x_range, y_range):
+                return True
+        return False
+
+    def set_parent_op(self, op):
+        self.parent_op = op
 
     def set_vertices(self, vertices):
         self.vertices = vertices
@@ -118,6 +143,9 @@ class RigUIButton:
 
     def set_use_shape(self, state):
         self.use_shape = state
+
+    def set_type(self, type):
+        self.type = type
 
     def load_shape_from_obj(self, obj_name, offset_obj=None):
         # Tagged not to load from bpy, use cached JSON instead
@@ -152,6 +180,7 @@ class RigUIButton:
     def to_dict(self):
         return {
             "use_shape": self.use_shape,
+            "type": self.type,
             "verts": vertex_to_float_array(self.vertices),
             "indices": self.indices,
             "outline_verts": vertex_to_float_array(self.vertices_lines),
@@ -174,7 +203,8 @@ class RigUIButton:
             "color": self.set_color,
             "object": self.load_shape_from_obj,
             "use_shape": self.set_use_shape,
-            "bone": self.set_linked_bone
+            "bone": self.set_linked_bone,
+            "type": self.set_type
         }
         for key in dictionary.keys():
             val = dictionary[key]
@@ -214,7 +244,7 @@ class RigUIButton:
         verts, notverts = self.scale_and_offset_verts()
         draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round(self.scale[0] / 6))
 
-
+    # Change this to do things other than selecting bones
     def select_button(self, shift=False):
         if bpy.context.active_object.type == "ARMATURE":
             if self.linked_bone not in bpy.context.active_object.data.bones:
@@ -232,7 +262,9 @@ class RigUIButton:
                 bpy.context.active_object.data.bones[self.linked_bone].select = True
                 self.state = button_state.selected
 
-
+    '''
+    Refactor all of this so it handles event types discreetly, and support for setting selection other than clicks
+    '''
     def handle_event(self, context, event):
         # Button presses etc, True if action is valid e.g. button was pressed
         ret = False

@@ -27,6 +27,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.buttons = []
         self.active_object = None
         self.text_key = None
+        self.tab_key = None
         self.scale_mod = 1
         self.transform_mod = [0, 0]
         self.transform_start = [0, 0]
@@ -34,10 +35,14 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
 
     def load_buttons(self, dict):
         """ Load buttons from mesh, if use_mesh_shapes is enabled """
+        # change dict.get to other tab names, and check for errors
         self.buttons.clear()
+        if dict.get(self.tab_key) is None:
+            return
         for obj in dict.get('buttons'):
             button = RigUIButton()
             button.get_properties(obj)
+            button.set_parent_op(self)
             self.buttons.append(button)
 
     def default_layout(self):

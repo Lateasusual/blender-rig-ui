@@ -50,7 +50,7 @@ def clear_json(text_key):
     text.write(json.dumps(default_dict))
 
 
-def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", offset_obj_key=""):
+def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", offset_obj_key="", tab_key="buttons"):
     """
      convert object properties to button properties
      TODO - Add object properties as arguments
@@ -75,7 +75,7 @@ def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", of
     button.load_shape_from_obj(shape_obj.name, offset_obj=offset_obj)
     button.set_use_shape(False)
 
-    dictionary["buttons"].append(button.to_dict())
+    dictionary[tab_key].append(button.to_dict())
     write_json(dictionary, text_key)
     return button  # just in case we want to keep it
 
