@@ -41,7 +41,7 @@ def get_mesh(obj, offset_obj=None):
         for v in bm_loops[0]:
             out_loops.append(v.co @ mat.transposed())
     else:
-        out_loops = [vertices]
+        out_loops = vertices
 
     return vertices, indices, out_loops
 
