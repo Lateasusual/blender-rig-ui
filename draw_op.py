@@ -27,7 +27,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.buttons = []
         self.active_object = None
         self.text_key = None
-        self.tab_key = None
+        self.tab_key = "buttons"
         self.scale_mod = 1
         self.transform_mod = [0, 0]
         self.transform_start = [0, 0]
