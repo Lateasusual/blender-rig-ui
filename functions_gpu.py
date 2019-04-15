@@ -3,6 +3,7 @@ Shared GPU functions for drawing shapes, collision detections etc.
 """
 
 import bpy
+import blf
 import gpu
 from gpu_extras.batch import batch_for_shader
 import bgl
@@ -12,6 +13,21 @@ import mathutils
 This file may actually be useless, given that bgl is now mostly deprecated
 possibly put custom GL_2D shaders in here for things like outlines / textures etc.
 """
+
+
+def draw_text(text, position, size=16, color=(1, 1, 1, 1)):
+    blf.size(0, size, 72)
+    size = blf.dimensions(0, text)
+
+    # centre text on position
+    pos_x = position[0] - size[0] / 2
+    pos_y = position[1] - size[1] / 2
+
+    blf.position(0, pos_x, pos_y, 0)
+
+    r, g, b, a = color
+    blf.color(0, r, g, b, a)
+    blf.draw(0, text)
 
 
 def draw_image():

@@ -20,8 +20,7 @@ def get_mesh(obj, offset_obj=None):
     vertex_count = [v.index for v in bm.verts]
     bm_loops = border_loops(bm, 0, [], vertex_count)
 
-    loop_vertices = []
-
+    out_loops = []
     vertices = []
     indices = []
 
@@ -40,11 +39,11 @@ def get_mesh(obj, offset_obj=None):
 
     if len(bm_loops) != 0:
         for v in bm_loops[0]:
-            loop_vertices.append(v.co @ mat.transposed())
+            out_loops.append(v.co @ mat.transposed())
     else:
-        loop_vertices = vertices
+        out_loops = [vertices]
 
-    return vertices, indices, loop_vertices
+    return vertices, indices, out_loops
 
 
 def border_loop(vert, loop):

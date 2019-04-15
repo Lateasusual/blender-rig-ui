@@ -13,7 +13,16 @@ from gpu_extras.batch import batch_for_shader
 from mathutils.geometry import intersect_point_tri_2d
 from mathutils import Vector
 from enum import Enum
+from statistics import mean
 from . functions_mesh import get_mesh
+from . functions_gpu import draw_text
+
+
+def average_position(in_vectors):
+    x = [lst[0] for lst in in_vectors]
+    y = [lst[1] for lst in in_vectors]
+    # Flattens the vector since we don't need z
+    return Vector((mean(x), mean(y), 0))
 
 
 def vertex_to_float_array(vertices):
@@ -120,20 +129,24 @@ class RigUIButton:
             return
         obj = bpy.data.objects[obj_name]
 
-        verts, indices, loop_verts = get_mesh(obj, offset_obj)
+        verts, indices, loop = get_mesh(obj, offset_obj)
         self.vertices = verts
         self.indices = indices
-        if loop_verts is None or len(loop_verts) == 0:
+
+        if loop is None or len(loop) == 0:
             return
+
         loop_indices = []
-        for i, v in enumerate(loop_verts):
-            if i < len(loop_verts) - 1:
-                loop_indices.append([i, i+1])
+
+        for i, v in enumerate(loop):
+            if i < len(loop) - 1:
+                loop_indices.append([i, i + 1])
             else:
                 loop_indices.append([i, 0])
 
-        self.vertices_lines = loop_verts
+        self.vertices_lines = loop
         self.indices_lines = loop_indices
+
         self.update_shader()
 
     def to_dict(self):
@@ -189,7 +202,6 @@ class RigUIButton:
         elif self.state is button_state.selected:
             color = (0.4, 0.4, 0.4, 1)
 
-
         # draw background
         self.shader.uniform_float("color", color)
         self.batch.draw(self.shader)
@@ -197,6 +209,11 @@ class RigUIButton:
         # draw lines
         self.shader.uniform_float("color", self.color)
         self.batch_lines.draw(self.shader)
+
+        # draw text
+        verts, notverts = self.scale_and_offset_verts()
+        draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round(self.scale[0] / 6))
+
 
     def select_button(self, shift=False):
         if bpy.context.active_object.type == "ARMATURE":
