@@ -10,7 +10,7 @@ import bpy
 import gpu
 import bgl
 from gpu_extras.batch import batch_for_shader
-from mathutils.geometry import intersect_point_tri_2d
+from mathutils.geometry import intersect_point_tri_2d, intersect_point_quad_2d
 from mathutils import Vector
 from enum import Enum
 from statistics import mean
@@ -47,15 +47,20 @@ def offset_verts(verts, offset):
 
 
 def is_triangle_in_rect(verts, x_range, y_range):
-    # if both are >= 1 then the triangle is within the range (must overlap)
-    x_overlap_counts = 0
-    y_overlap_counts = 0
+    x1 = x_range[0]
+    x2 = x_range[1]
+    y1 = y_range[0]
+    y2 = y_range[1]
+
+    p1 = Vector((x1, y1))
+    p2 = Vector((x1, y2))
+    p3 = Vector((x2, y2))
+    p4 = Vector((x2, y1))
+
     for v in verts:
-        if x_range[0] < v[0] < x_range[1]:
-            x_overlap_counts += 1
-        if y_range[0] < v[1] < y_range[1]:
-            y_overlap_counts += 1
-    return x_overlap_counts > 0 and y_overlap_counts > 0
+        if intersect_point_quad_2d(v, p1, p2, p3, p4):
+            return True
+
 
 
 class button_state(Enum):

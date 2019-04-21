@@ -160,7 +160,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         y_range = [self.box_select_start[1], y]
         for button in self.buttons:
             if button.is_shape_in_rect(x_range, y_range):
-                button.select_button(shift=True, select_only=True)
+                # button.select_button(shift=True, select_only=True)
+                # selection algorithm a wee tad broken
+                pass
 
 
 
