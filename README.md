@@ -1,10 +1,7 @@
 # blender-rig-ui
 Addon for Blender 2.80 for customisable rigging interfaces
 
-Thanks for dropping by :)
-
 # Installation
-[Latest Stable Release]() (none just yet ;) )
 Download repository as ZIP, then in Blender:
   Edit -> Preferences -> Add-ons -> Install... -> select blender-rig-ui.zip
   

@@ -65,6 +65,13 @@ class button_state(Enum):
     selected = 3
 
 
+button_types = {
+    "bone": 0,
+    "tab": 1,
+    "operator": 2
+}
+
+
 class RigUIButton:
     def __init__(self):
         """ Button initialisation and attributes here """
@@ -82,7 +89,7 @@ class RigUIButton:
 
         self.parent_op = None
         # Button function, e.g. bone to select bones, or tab for tabs etc. etc.
-        self.type = "bone"
+        self.type = 0
         self.linked_bone = ""
         self.use_shape = True
         self.shape_object_name = ""
@@ -145,7 +152,7 @@ class RigUIButton:
         self.use_shape = state
 
     def set_type(self, type):
-        self.type = type
+        self.type = button_types[type] if type in button_types else 0
 
     def load_shape_from_obj(self, obj_name, offset_obj=None):
         # Tagged not to load from bpy, use cached JSON instead
@@ -215,8 +222,8 @@ class RigUIButton:
 
     def draw(self):
         if bpy.context.active_object.type == "ARMATURE":
-            if self.linked_bone not in bpy.context.active_object.data.bones:
-                return  # don't draw if there's nothing to draw :D
+            # if self.linked_bone not in bpy.context.active_object.data.bones:
+            #     return  # don't draw if there's nothing to draw :D
             bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
             if bone_selected:
                 self.state = button_state.selected
@@ -224,6 +231,7 @@ class RigUIButton:
                 pass
             elif self.state == button_state.selected:
                 self.state = button_state.default
+
         self.shader.bind()
         color = (0.3, 0.3, 0.3, 1)
 
@@ -244,23 +252,33 @@ class RigUIButton:
         verts, notverts = self.scale_and_offset_verts()
         draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round(self.scale[0] / 6))
 
-    # Change this to do things other than selecting bones
+    def select_type_bone(self, shift):
+        if self.linked_bone not in bpy.context.active_object.data.bones:
+            return
+        bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
+        bpy.ops.object.mode_set(mode='POSE')
+        if shift:
+            bpy.context.active_object.data.bones[self.linked_bone].select = not bone_selected
+            if bone_selected:
+                self.state = button_state.selected
+            else:
+                self.state = button_state.hovered
+        else:
+            bpy.ops.pose.select_all(action='DESELECT')
+            bpy.context.active_object.data.bones[self.linked_bone].select = True
+            self.state = button_state.selected
+
+    def select_type_tab(self, shift):
+        pass
+
     def select_button(self, shift=False):
         if bpy.context.active_object.type == "ARMATURE":
-            if self.linked_bone not in bpy.context.active_object.data.bones:
-                return
-            bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
-            bpy.ops.object.mode_set(mode='POSE')
-            if shift:
-                bpy.context.active_object.data.bones[self.linked_bone].select = not bone_selected
-                if bone_selected:
-                    self.state = button_state.selected
-                else:
-                    self.state = button_state.hovered
-            else:
-                bpy.ops.pose.select_all(action='DESELECT')
-                bpy.context.active_object.data.bones[self.linked_bone].select = True
-                self.state = button_state.selected
+            if self.type == button_types["bone"]:
+                self.select_type_bone(shift)
+            if self.type == button_types["tab"]:
+                self.select_type_tab(shift)
+
+
 
     '''
     Refactor all of this so it handles event types discreetly, and support for setting selection other than clicks

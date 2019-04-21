@@ -53,14 +53,7 @@ def clear_json(text_key):
 def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", offset_obj_key="", tab_key="buttons"):
     """
      convert object properties to button properties
-     TODO - Add object properties as arguments
-     E.G:
-        - Object colour
-        - Object scale / rotation (?)
-        - Bone to link / Operator (add ops later, just bones for now)
-        - Whether to load shape from object or not...
-        - Support for looping through all objects in collection etc.
-     """
+    """
     if bone == "":
         return None
     dictionary = get_json_dict(text_key)

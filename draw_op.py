@@ -39,7 +39,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.buttons.clear()
         if dict.get(self.tab_key) is None:
             return
-        for obj in dict.get('buttons'):
+        for obj in dict.get(self.tab_key):
             button = RigUIButton()
             button.get_properties(obj)
             button.set_parent_op(self)
