@@ -30,6 +30,27 @@ def draw_text(text, position, size=16, color=(1, 1, 1, 1)):
     blf.draw(0, text)
 
 
+def draw_box(point1, point2, color=(0.4, 0.4, 0.4, 1)):
+    w = point2[0]
+    h = point2[1]
+    x = point1[0]
+    y = point1[1]
+    background_verts = (
+        (x, y),
+        (x, h),
+        (w, h),
+        (w, y)
+    )
+    background_indices = ((0, 1, 2), (0, 2, 3))
+    background_shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+    background_batch = batch_for_shader(background_shader, 'TRIS',
+                                        {"pos": background_verts}, indices=background_indices)
+    background_shader.bind()
+    background_shader.uniform_float("color", color)
+
+    background_batch.draw(background_shader)
+
+
 def draw_image():
     """
     This is doesn't work for now (black image?)

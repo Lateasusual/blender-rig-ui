@@ -32,6 +32,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         self.transform_mod = [0, 0]
         self.transform_start = [0, 0]
         self.is_moving = False
+        self.is_box_selecting = False
+        self.box_select_start = [0, 0]
+        self.box_select_end = [0, 0]
 
     def load_buttons(self, dict):
         """ Load buttons from mesh, if use_mesh_shapes is enabled """
@@ -94,6 +97,13 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             if is_mouse_in_area(context, event):
                 self.scale_mod -= 0.1 * self.scale_mod
 
+        # if we're not over a button do a selection box
+        if event.alt:
+            if event.type == "MOUSEMOVE":
+                self.box_select(event)
+        else:
+            self.is_box_selecting = False
+
         if event.type == "MOUSEMOVE" and event.ctrl:
             x = context.area.width - event.mouse_region_x
             y = context.area.height - event.mouse_region_y
@@ -111,14 +121,11 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         for button in self.buttons:
             if button.handle_event(context, event):
                 return True
-        # if we're not over a button do a selection box
-        # TODO add box select
         return False
 
     def modal(self, context, event):
         # pass events to buttons
         if event.type == "TIMER":
-            # self.draw_callback_px(self, context) # CRASHES! >_< (probably wrong context but we can't fix that)
             return {'PASS_THROUGH'}
         if self.handle_events(context, event):
             return {'RUNNING_MODAL'}
@@ -141,6 +148,22 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
     def draw(self, context):
         pass
 
+    def box_select(self, event):
+        x = event.mouse_region_x
+        y = event.mouse_region_y
+        if not self.is_box_selecting:
+            self.box_select_start = [x, y]
+            self.box_select_end = [x, y]
+            self.is_box_selecting = True
+        self.box_select_end = [x, y]
+        x_range = [self.box_select_start[0], x]
+        y_range = [self.box_select_start[1], y]
+        for button in self.buttons:
+            if button.is_shape_in_rect(x_range, y_range):
+                button.select_button(shift=True, select_only=True)
+
+
+
     def draw_callback_px(self, op, context):
         if self.text_key != context.active_object.rigUI_ui_name:
             self.text_key = context.active_object.rigUI_ui_name
@@ -160,9 +183,12 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         width = context.area.width
         height = context.area.height
 
+        if self.is_box_selecting:  # Draw under buttons
+            draw_box(self.box_select_start, self.box_select_end)
 
         for button in self.buttons:
             button.set_offset([width / 2 + self.transform_mod[0], height / 2 + self.transform_mod[1]])
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
             button.update_shader()
             button.draw()
+

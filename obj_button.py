@@ -253,13 +253,16 @@ class RigUIButton:
         if bpy.context.scene.rigUI_text_scale != 0:
             draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
 
-    def select_type_bone(self, shift):
+    def select_type_bone(self, shift, select_only=False):
         if self.linked_bone not in bpy.context.active_object.data.bones:
             return
         bone_selected = bpy.context.active_object.data.bones[self.linked_bone].select
         bpy.ops.object.mode_set(mode='POSE')
-        if shift:
-            bpy.context.active_object.data.bones[self.linked_bone].select = not bone_selected
+        if shift or select_only:
+            if select_only:
+                bpy.context.active_object.data.bones[self.linked_bone].select = True
+            else:
+                bpy.context.active_object.data.bones[self.linked_bone].select = not bone_selected
             if bone_selected:
                 self.state = button_state.selected
             else:
@@ -269,17 +272,15 @@ class RigUIButton:
             bpy.context.active_object.data.bones[self.linked_bone].select = True
             self.state = button_state.selected
 
-    def select_type_tab(self, shift):
+    def select_type_tab(self, shift, select_only=False):
         pass
 
-    def select_button(self, shift=False):
+    def select_button(self, shift=False, select_only=False):
         if bpy.context.active_object.type == "ARMATURE":
             if self.type == button_types["bone"]:
-                self.select_type_bone(shift)
+                self.select_type_bone(shift, select_only=select_only)
             if self.type == button_types["tab"]:
-                self.select_type_tab(shift)
-
-
+                self.select_type_tab(shift, select_only=select_only)
 
     '''
     Refactor all of this so it handles event types discreetly, and support for setting selection other than clicks
