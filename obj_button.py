@@ -236,21 +236,22 @@ class RigUIButton:
         color = (0.3, 0.3, 0.3, 1)
 
         if self.state is button_state.hovered:
-            color = (0.5, 0.5, 0.5, 1)
+            color = (0.5, 0.5, 0.8, 1)
         elif self.state is button_state.selected:
-            color = (0.4, 0.4, 0.4, 1)
+            color = (0.8, 0.8, 1.0, 1)
 
         # draw background
-        self.shader.uniform_float("color", color)
+        self.shader.uniform_float("color", self.color)
         self.batch.draw(self.shader)
 
         # draw lines
-        self.shader.uniform_float("color", self.color)
+        self.shader.uniform_float("color", color)
         self.batch_lines.draw(self.shader)
 
         # draw text
         verts, notverts = self.scale_and_offset_verts()
-        draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round(self.scale[0] / 6))
+        if bpy.context.scene.rigUI_text_scale != 0:
+            draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
 
     def select_type_bone(self, shift):
         if self.linked_bone not in bpy.context.active_object.data.bones:

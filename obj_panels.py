@@ -37,7 +37,8 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
         op.canvas_object = context.scene.rigUI_canvas_object
         row = layout.row()
         op = row.operator("rigui.create_canvas")
-
+        row = layout.row()
+        row.prop(context.scene, "rigUI_text_scale")
         if context.active_object.type == "MESH":
             row = layout.row()
             row.prop(context.active_object, "rigUI_button_type")
@@ -54,8 +55,6 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
             elif context.active_object["rigUI_button_type"] == 1:
                 row = layout.row()
                 row.label(text="YEET")
-            row = layout.row()
-            row.prop(context.active_object, "rigUI_tab_key")
             row = layout.row()
             row.prop(context.active_object, "color")
 

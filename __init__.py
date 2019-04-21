@@ -38,6 +38,7 @@ def ui_icon(self, context):
         op = self.layout.operator("rigui.ui_draw", icon='MOD_ARMATURE', text='')
     else:
         op = self.layout.operator("rigui.ui_close", icon='MOD_ARMATURE', text='', depress=True)
+        self.layout.prop_search(context.active_object, "rigUI_ui_name", bpy.data, "texts", text="")
 
 
 def register():
@@ -52,9 +53,9 @@ def register():
     bpy.types.Scene.rigUI_build_rig = bpy.props.StringProperty(name="Rig", default="")
     bpy.types.Object.rigUI_linked_bone = bpy.props.StringProperty(name="Bone", default="")
     bpy.types.Object.rigUI_ui_name = bpy.props.StringProperty(name="UI", default="")
-    bpy.types.Object.rigUI_tab_key = bpy.props.StringProperty(name="Tab", default="buttons")
     bpy.types.Object.rigUI_button_type = bpy.props.EnumProperty(items=button_types, name="Button Type", default="0")
     bpy.types.Scene.rigUI_canvas_object = bpy.props.StringProperty(name="Offset Object")
+    bpy.types.Scene.rigUI_text_scale = bpy.props.FloatProperty(name="Text Scale", default=1.0)
 
     # Prepend for image header here
     bpy.types.IMAGE_HT_header.prepend(ui_icon)
@@ -73,7 +74,6 @@ def unregister():
     del bpy.types.Object.rigUI_linked_bone
     del bpy.types.Object.rigUI_ui_name
     del bpy.types.Scene.rigUI_canvas_object
-    del bpy.types.Object.rigUI_tab_key
 
 
 if __name__ == '__main__':
