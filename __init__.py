@@ -46,6 +46,7 @@ def register():
     bpy.types.Scene.rigUI_build_rig = bpy.props.StringProperty(name="Rig", default="")
     bpy.types.Object.rigUI_linked_bone = bpy.props.StringProperty(name="Bone", default="")
     bpy.types.Object.rigUI_ui_name = bpy.props.StringProperty(name="UI", default="")
+    bpy.types.Object.rigUI_tab_key = bpy.props.StringProperty(name="Tab", default="buttons")
     bpy.types.Scene.rigUI_canvas_object = bpy.props.StringProperty(name="Offset Object")
 
     # Prepend for image header here
@@ -65,6 +66,7 @@ def unregister():
     del bpy.types.Object.rigUI_linked_bone
     del bpy.types.Object.rigUI_ui_name
     del bpy.types.Scene.rigUI_canvas_object
+    del bpy.types.Object.rigUI_tab_key
 
 
 if __name__ == '__main__':

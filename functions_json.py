@@ -67,7 +67,8 @@ def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", of
         offset_obj = None
     button.load_shape_from_obj(shape_obj.name, offset_obj=offset_obj)
     button.set_use_shape(False)
-
+    if tab_key not in dictionary:
+        dictionary.update({tab_key: []})
     dictionary[tab_key].append(button.to_dict())
     write_json(dictionary, text_key)
     return button  # just in case we want to keep it

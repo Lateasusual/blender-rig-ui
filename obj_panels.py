@@ -47,6 +47,8 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
             row.prop_search(context.active_object, "rigUI_linked_bone",
                             bpy.data.armatures[context.scene.rigUI_build_rig], "bones")
             row = layout.row()
+            row.prop(context.active_object, "rigUI_tab_key")
+            row = layout.row()
             row.prop(context.active_object, "color")
 
         if context.active_object.type == "ARMATURE":
