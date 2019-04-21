@@ -26,6 +26,12 @@ classes = {
     RIGUI_OT_CreateCanvas
 }
 
+button_types = [
+    ('0', "Bone select", "Selects a bone when pressed"),
+    ('1', "Tab select", "Changes tabs when pressed"),
+    # ('2', "Operator", "Run an operator when pressed")
+]
+
 
 def ui_icon(self, context):
     if not context.scene.rigUI_active:
@@ -47,6 +53,7 @@ def register():
     bpy.types.Object.rigUI_linked_bone = bpy.props.StringProperty(name="Bone", default="")
     bpy.types.Object.rigUI_ui_name = bpy.props.StringProperty(name="UI", default="")
     bpy.types.Object.rigUI_tab_key = bpy.props.StringProperty(name="Tab", default="buttons")
+    bpy.types.Object.rigUI_button_type = bpy.props.EnumProperty(items=button_types, name="Button Type", default="0")
     bpy.types.Scene.rigUI_canvas_object = bpy.props.StringProperty(name="Offset Object")
 
     # Prepend for image header here

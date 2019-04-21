@@ -40,12 +40,20 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
 
         if context.active_object.type == "MESH":
             row = layout.row()
+            row.prop(context.active_object, "rigUI_button_type")
+
+            row = layout.row()
             row.label(text="Button Settings:")
-            row = layout.row()
-            row.prop_search(context.scene, "rigUI_build_rig", bpy.data, "armatures")
-            row = layout.row()
-            row.prop_search(context.active_object, "rigUI_linked_bone",
-                            bpy.data.armatures[context.scene.rigUI_build_rig], "bones")
+
+            if "rigUI_button_type" not in context.active_object or context.active_object["rigUI_button_type"] == 0:
+                row = layout.row()
+                row.prop_search(context.scene, "rigUI_build_rig", bpy.data, "armatures")
+                row = layout.row()
+                row.prop_search(context.active_object, "rigUI_linked_bone",
+                                bpy.data.armatures[context.scene.rigUI_build_rig], "bones")
+            elif context.active_object["rigUI_button_type"] == 1:
+                row = layout.row()
+                row.label(text="YEET")
             row = layout.row()
             row.prop(context.active_object, "rigUI_tab_key")
             row = layout.row()

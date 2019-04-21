@@ -29,6 +29,7 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
     layout_text = bpy.props.StringProperty("text")
     canvas_object = bpy.props.StringProperty("root object")
 
+
     def execute(self, context):
         col = bpy.data.collections[self.canvas_collection]
         bpy.ops.object.mode_set(mode="OBJECT")

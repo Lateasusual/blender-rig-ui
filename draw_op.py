@@ -45,6 +45,10 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             button.set_parent_op(self)
             self.buttons.append(button)
 
+    def change_tab(self, tab):
+        self.tab_key = tab
+        self.reload_layout()
+
     def default_layout(self):
         """ Called if we have no layout to display """
         self.buttons.clear()
