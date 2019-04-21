@@ -85,10 +85,10 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             bpy.context.scene["rigUI_tag_reload"] = True
         if event.type == "WHEELUPMOUSE":
             if is_mouse_in_area(context, event):
-                self.scale_mod += 0.1
+                self.scale_mod += 0.1 * self.scale_mod
         if event.type == "WHEELDOWNMOUSE":
             if is_mouse_in_area(context, event):
-                self.scale_mod -= 0.1
+                self.scale_mod -= 0.1 * self.scale_mod
 
         if event.type == "MOUSEMOVE" and event.ctrl:
             x = context.area.width - event.mouse_region_x
