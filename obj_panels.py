@@ -22,12 +22,9 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        row = layout.row()
-        row.prop_search(context.scene, "rigUI_collection", bpy.data, "collections")
-        row = layout.row()
-        row.prop_search(context.scene, "rigUI_build_text_name", bpy.data, "texts")
-        row = layout.row()
-        row.prop_search(context.scene, "rigUI_canvas_object", bpy.data, "objects")
+        layout.prop_search(context.scene, "rigUI_collection", bpy.data, "collections")
+        layout.prop_search(context.scene, "rigUI_build_text_name", bpy.data, "texts")
+        layout.prop_search(context.scene, "rigUI_canvas_object", bpy.data, "objects")
 
         row = layout.row()
         row.scale_y = 2
@@ -39,6 +36,7 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
         op = row.operator("rigui.create_canvas")
         row = layout.row()
         row.prop(context.scene, "rigUI_text_scale")
+
         if context.active_object.type == "MESH":
             row = layout.row()
             row.prop(context.active_object, "rigUI_button_type")

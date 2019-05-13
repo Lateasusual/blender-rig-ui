@@ -15,7 +15,7 @@ bl_info = {
     "version": (0, 1, 0),
     "blender": (2, 80, 0),
     "location": "Image Editor",
-    "category": "animation"
+    "category": "Animation"
 }
 
 classes = {
