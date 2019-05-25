@@ -97,12 +97,6 @@ def draw_image():
     x = 0
     y = 0
 
-    img_verts = (
-        (x, y),
-        (x, h),
-        (w, h),
-        (w, y)
-    )
     filepath = "G:/TEMP/4.png"
     image = bpy.data.images.load(filepath, check_existing=True)
     draw_texture_2d(image.bindcode, (x, y), w, h)

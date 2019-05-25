@@ -70,8 +70,6 @@ def json_batch_add(objects, layout_text='', canvas_object_key=''):
 def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", offset_obj_key="", tab_key="buttons"):
     """
      convert object properties to button properties
-     TODO: HOLY CRAP DON'T REWRITE IT EVERY TIME, buffer up the json in memory then write it as one
-     THIS IS FOR SINGULAR BUTTON ADDING NOT FOR BATCH YOU IDIOT WHAT THE FUCK
     """
     if bone == "":
         return None
