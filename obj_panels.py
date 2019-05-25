@@ -61,4 +61,3 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
             row.label(text="Rig Settings")
             row = layout.row()
             row.prop_search(context.active_object, "rigUI_ui_name", bpy.data, "texts")
-

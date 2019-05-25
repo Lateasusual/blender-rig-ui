@@ -8,12 +8,14 @@ from .obj_button import *
 from .functions_json import *
 from .functions_gpu import *
 
+
 def is_mouse_in_area(context, event):
     width = context.area.width
     height = context.area.height
     x = event.mouse_region_x
     y = event.mouse_region_y
     return 0 < x < width and 0 < y < height
+
 
 class RIGUI_OT_OpenUI(bpy.types.Operator):
     """ Opens RigUI in the Image Editor"""
@@ -164,8 +166,6 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
                 # selection algorithm a wee tad broken
                 pass
 
-
-
     def draw_callback_px(self, op, context):
         if self.text_key != context.active_object.rigUI_ui_name:
             self.text_key = context.active_object.rigUI_ui_name
@@ -193,8 +193,8 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         buffer_colors = []
         outline_buffer_verts = []
         outline_buffer_indices = [[], [], [], ]
-        n_verts=0
-        n_o_verts=0
+        n_verts = 0
+        n_o_verts = 0
 
         for button in self.buttons:
             # Add ALL button verts to buffers by shader,
@@ -209,12 +209,12 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
                 buffer_colors.append(color)
 
             for i in indices:
-                buffer_indices.append([i[0]+n_verts, i[1]+n_verts, i[2]+n_verts])
+                buffer_indices.append([i[0] + n_verts, i[1] + n_verts, i[2] + n_verts])
 
             for v in o_verts:
                 outline_buffer_verts.append(v)
             for i in o_indices:
-                outline_buffer_indices[state.value].append([i[0]+n_o_verts, i[1]+n_o_verts])
+                outline_buffer_indices[state.value].append([i[0] + n_o_verts, i[1] + n_o_verts])
 
             n_verts += len(verts)
             n_o_verts += len(o_verts)

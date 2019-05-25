@@ -13,8 +13,8 @@ from mathutils.geometry import intersect_point_tri_2d, intersect_point_quad_2d
 from mathutils import Vector
 from enum import Enum
 from statistics import mean
-from . functions_mesh import get_mesh
-from . functions_gpu import draw_text
+from .functions_mesh import get_mesh
+from .functions_gpu import draw_text
 
 
 def average_position(in_vectors):
@@ -257,7 +257,8 @@ class RigUIButton:
 
         # draw text
         if bpy.context.scene.rigUI_text_scale > 0:
-            draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
+            draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]],
+                      size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
         return (verts, self.indices, self.color), (vertices_lines, self.indices_lines), self.state
 
     def select_type_bone(self, shift, select_only=False):
@@ -292,6 +293,7 @@ class RigUIButton:
     '''
     Refactor all of this so it handles event types discreetly, and support for setting selection other than clicks
     '''
+
     def handle_event(self, context, event):
         # Button presses etc, True if action is valid e.g. button was pressed
         ret = False

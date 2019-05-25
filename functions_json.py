@@ -4,7 +4,7 @@ JSON text handler functions for saving and loading layouts
 
 import bpy
 import json
-from . obj_button import RigUIButton
+from .obj_button import RigUIButton
 
 default_dict = {
     "rig_name": "",
@@ -89,4 +89,3 @@ def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", of
     dictionary[tab_key].append(button.to_dict())
     write_json(dictionary, text_key)
     return button  # just in case we want to keep it
-

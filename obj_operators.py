@@ -5,7 +5,7 @@ Register other operators:
 """
 
 import bpy
-from . functions_json import *
+from .functions_json import *
 
 
 def get_collection(name):
@@ -29,7 +29,6 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
     canvas_collection: bpy.props.StringProperty("collection")
     layout_text: bpy.props.StringProperty("text")
     canvas_object: bpy.props.StringProperty("root object")
-
 
     def execute(self, context):
         col = bpy.data.collections[self.canvas_collection]
@@ -91,4 +90,3 @@ class RIGUI_OT_CreateCanvas(bpy.types.Operator):
         context.scene.rigUI_collection = self.new_ui_canvas
         context.scene.rigUI_build_text_name = self.new_ui_name
         return {'FINISHED'}
-
