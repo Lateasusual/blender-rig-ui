@@ -12,7 +12,7 @@ bl_info = {
     "name": "blender-rig-ui",
     "description": "Editable UI interface for rig animation",
     "author": "Lateasusual",
-    "version": (0, 1, 0),
+    "version": (1, 0, 0),
     "blender": (2, 80, 0),
     "location": "Image Editor",
     "category": "Animation"
