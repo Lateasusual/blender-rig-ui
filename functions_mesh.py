@@ -2,10 +2,7 @@
 Mesh functions (edge loops etc.) for importing meshes as button shapes
 """
 
-import bpy
-from mathutils import Vector
 import bmesh
-from bpy_extras import mesh_utils
 
 
 def get_mesh(obj, offset_obj=None):
@@ -20,7 +17,6 @@ def get_mesh(obj, offset_obj=None):
     vertex_count = [v.index for v in bm.verts]
     bm_loops = border_loops(bm, 0, [], vertex_count)
 
-    out_loops = []
     vertices = []
     indices = []
 
@@ -37,13 +33,27 @@ def get_mesh(obj, offset_obj=None):
         # multiply for rotation etc
         vertices.append(vert.co.xyz @ mat.transposed())
 
-    if len(bm_loops) != 0:
-        for v in bm_loops[0]:
-            out_loops.append(v.co @ mat.transposed())
-    else:
-        out_loops = vertices
+    loop_indices = []
+    loop_verts = []
 
-    return vertices, indices, out_loops
+    n_loops = 0
+    for loop in bm_loops:
+
+        out_loop = []
+
+        for v in loop:
+            out_loop.append(v.co @ mat.transposed())
+
+        for i, v in enumerate(out_loop):
+            if i < len(out_loop) - 1:
+                loop_indices.append([i+n_loops, i + n_loops + 1])
+            else:
+                loop_indices.append([i + n_loops, 0 + n_loops])
+
+        n_loops += len(out_loop)
+        loop_verts.extend(out_loop)
+
+    return vertices, indices, loop_verts, loop_indices
 
 
 def border_loop(vert, loop):

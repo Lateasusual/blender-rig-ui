@@ -166,10 +166,10 @@ class RigUIButton:
             return
         obj = bpy.data.objects[obj_name]
 
-        verts, indices, loop = get_mesh(obj, offset_obj)
+        verts, indices, loop, loop_indices = get_mesh(obj, offset_obj)
         self.vertices = verts
         self.indices = indices
-
+        '''
         if loop is None or len(loop) == 0:
             return
 
@@ -180,7 +180,7 @@ class RigUIButton:
                 loop_indices.append([i, i + 1])
             else:
                 loop_indices.append([i, 0])
-
+        '''
         self.vertices_lines = loop
         self.indices_lines = loop_indices
 

@@ -6,8 +6,7 @@ import bpy
 import blf
 import gpu
 from gpu_extras.batch import batch_for_shader
-import bgl
-import mathutils
+from gpu_extras.presets import draw_texture_2d
 
 """
 This file may actually be useless, given that bgl is now mostly deprecated
@@ -91,8 +90,7 @@ def draw_box(point1, point2, color=(0.4, 0.4, 0.4, 1)):
 
 def draw_image():
     """
-    This is doesn't work for now (black image?)
-    Must be called inside a draw call context to work
+    This is doesn't work for now (black image?) -> Bug with BGL, just doesn't work no matter what unfortunately :(
     """
     w = 500
     h = 500
@@ -105,21 +103,9 @@ def draw_image():
         (w, h),
         (w, y)
     )
-    filepath = "C:/Users/Christopher/AppData/Roaming/Blender Foundation/" \
-               "Blender/2.80/scripts/addons/blender-rig-ui/img/test.jpg"
+    filepath = "G:/TEMP/4.png"
     image = bpy.data.images.load(filepath, check_existing=True)
-
-    bgl.glActiveTexture(bgl.GL_TEXTURE0)
-    bgl.glBindTexture(bgl.GL_TEXTURE_2D, image.bindcode)
-
-    img_shader = gpu.shader.from_builtin('2D_IMAGE')
-    img_batch = batch_for_shader(img_shader, 'TRI_FAN',
-                                 {"pos": img_verts,
-                                  "texCoord": ((0, 1), (0, 0), (1, 0), (1, 1)),
-                                  "image": image}, )
-    img_shader.bind()
-    img_shader.uniform_int("image", 0)
-    img_batch.draw(img_shader)
+    draw_texture_2d(image.bindcode, (x, y), w, h)
 
 
 def draw_background(context):
