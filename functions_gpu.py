@@ -15,6 +15,36 @@ possibly put custom GL_2D shaders in here for things like outlines / textures et
 """
 
 
+def draw_buffer_outlines(outline_verts=None,
+                         indices_all=(
+                                 ([0, 1, 2],),
+                                 ([0, 1, 2],),
+                                 ([0, 1, 2],)
+                         ),
+                         colours=(
+                                 (0.3, 0.3, 0.3, 1),
+                                 (0.5, 0.5, 0.8, 1),
+                                 (0.8, 0.8, 1.0, 1)
+                         )):
+    if outline_verts is None:
+        outline_verts = [
+            [0, 0],
+            [1, 0],
+            [0, 1]
+        ]
+    shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
+    batch_default = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[0])
+    batch_hovered = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[1])
+    batch_selected = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[2])
+
+    shader.uniform_float("color", colours[0])
+    batch_default.draw(shader)
+    shader.uniform_float("color", colours[1])
+    batch_hovered.draw(shader)
+    shader.uniform_float("color", colours[2])
+    batch_selected.draw(shader)
+
+
 def draw_text(text, position, size=16, color=(1, 1, 1, 1)):
     blf.size(0, size, 72)
     size = blf.dimensions(0, text)

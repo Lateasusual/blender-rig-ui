@@ -189,8 +189,9 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             draw_box(self.box_select_start, self.box_select_end)
 
         for button in self.buttons:
+            # Add ALL button verts to buffers by shader,
+            # then draw them all at once - from 1+n_buttons draw calls to 3+n_shaders
             button.set_offset([width / 2 + self.transform_mod[0], height / 2 + self.transform_mod[1]])
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
             button.update_shader()
             button.draw()
-

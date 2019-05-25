@@ -255,7 +255,7 @@ class RigUIButton:
 
         # draw text
         verts, notverts = self.scale_and_offset_verts()
-        if bpy.context.scene.rigUI_text_scale != 0:
+        if bpy.context.scene.rigUI_text_scale >= 0:
             draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
 
     def select_type_bone(self, shift, select_only=False):
