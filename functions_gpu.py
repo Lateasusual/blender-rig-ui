@@ -15,6 +15,13 @@ possibly put custom GL_2D shaders in here for things like outlines / textures et
 """
 
 
+def draw_buffer_backgrounds(verts, indices, colours):
+    shader = gpu.shader.from_builtin('2D_SMOOTH_COLOR')
+    batch = batch_for_shader(shader, 'TRIS', {"pos": verts, "color": colours}, indices=indices)
+    shader.bind()
+    batch.draw(shader)
+
+
 def draw_buffer_outlines(outline_verts=None,
                          indices_all=(
                                  ([0, 1, 2],),

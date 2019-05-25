@@ -8,7 +8,6 @@ irrelevant... maybe don't even bother with x/y
 
 import bpy
 import gpu
-import bgl
 from gpu_extras.batch import batch_for_shader
 from mathutils.geometry import intersect_point_tri_2d, intersect_point_quad_2d
 from mathutils import Vector
@@ -60,7 +59,6 @@ def is_triangle_in_rect(verts, x_range, y_range):
     for v in verts:
         if intersect_point_quad_2d(v, p1, p2, p3, p4):
             return True
-
 
 
 class button_state(Enum):
@@ -237,11 +235,10 @@ class RigUIButton:
             elif self.state == button_state.selected:
                 self.state = button_state.default
 
-        self.shader.bind()
+        # self.shader.bind()
 
-        # draw background
-        self.shader.uniform_float("color", self.color)
-        self.batch.draw(self.shader)
+        # self.shader.uniform_float("color", self.color)
+        # self.batch.draw(self.shader)
 
         '''
         color = (0.3, 0.3, 0.3, 1)
@@ -261,7 +258,7 @@ class RigUIButton:
         # draw text
         if bpy.context.scene.rigUI_text_scale > 0:
             draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
-        return vertices_lines, self.indices_lines, self.state
+        return (verts, self.indices, self.color), (vertices_lines, self.indices_lines), self.state
 
     def select_type_bone(self, shift, select_only=False):
         if self.linked_bone not in bpy.context.active_object.data.bones:

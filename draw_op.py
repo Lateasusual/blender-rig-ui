@@ -188,9 +188,13 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         if self.is_box_selecting:  # Draw under buttons
             draw_box(self.box_select_start, self.box_select_end)
 
+        buffer_verts = []
+        buffer_indices = []
+        buffer_colors = []
         outline_buffer_verts = []
         outline_buffer_indices = [[], [], [], ]
         n_verts=0
+        n_o_verts=0
 
         for button in self.buttons:
             # Add ALL button verts to buffers by shader,
@@ -198,14 +202,21 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             button.set_offset([width / 2 + self.transform_mod[0], height / 2 + self.transform_mod[1]])
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
 
-            verts, indices, state = button.draw()
-
+            (verts, indices, color), (o_verts, o_indices), state = button.draw()
             for v in verts:
-                outline_buffer_verts.append(v)
+                buffer_verts.append(v)
+                buffer_colors.append(color)
 
             for i in indices:
-                outline_buffer_indices[state.value].append([i[0]+n_verts, i[1]+n_verts])
+                buffer_indices.append([i[0]+n_verts, i[1]+n_verts, i[2]+n_verts])
 
-            n_verts+=len(verts)
+            for v in o_verts:
+                outline_buffer_verts.append(v)
+            for i in o_indices:
+                outline_buffer_indices[state.value].append([i[0]+n_o_verts, i[1]+n_o_verts])
 
+            n_verts += len(verts)
+            n_o_verts += len(o_verts)
+
+        draw_buffer_backgrounds(buffer_verts, buffer_indices, buffer_colors)
         draw_buffer_outlines(outline_buffer_verts, outline_buffer_indices)
