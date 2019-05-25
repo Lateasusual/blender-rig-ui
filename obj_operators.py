@@ -40,6 +40,7 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
             bpy.context.view_layer.objects.active = obj
             bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
             bpy.ops.object.scale_clear(clear_delta=False)
+        '''
         for obj in col.all_objects:
             if obj.type == "MESH":
                 button = json_add_button_obj(self.layout_text,
@@ -47,6 +48,8 @@ class RIGUI_OT_AddButton(bpy.types.Operator):
                                              bone=obj.rigUI_linked_bone,
                                              offset_obj_key=self.canvas_object,
                                              tab_key="buttons")
+        '''
+        json_batch_add(col.all_objects, self.layout_text, self.canvas_object)
         context.scene["rigUI_tag_reload"] = True
         return {'FINISHED'}
 

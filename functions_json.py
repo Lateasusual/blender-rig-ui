@@ -50,10 +50,28 @@ def clear_json(text_key):
     text.write(json.dumps(default_dict))
 
 
+def json_batch_add(objects, layout_text='', canvas_object_key=''):
+    dictionary = get_json_dict(layout_text)
+    for obj in objects:
+        if obj.type == "MESH":
+            button = RigUIButton()
+            button.set_color(obj.color)
+            button.set_linked_bone(obj.rigUI_linked_bone)
+            if canvas_object_key in bpy.data.objects:
+                canvas_obj = bpy.data.objects[canvas_object_key]
+            else:
+                canvas_obj = None
+            button.load_shape_from_obj(obj.name, offset_obj=canvas_obj)
+            button.set_use_shape(False)
+            dictionary["buttons"].append(button.to_dict())
+    write_json(dictionary, layout_text)
+
+
 def json_add_button_obj(text_key, shape_obj, color=(0.5, 0.5, 1, 1), bone="", offset_obj_key="", tab_key="buttons"):
     """
      convert object properties to button properties
      TODO: HOLY CRAP DON'T REWRITE IT EVERY TIME, buffer up the json in memory then write it as one
+     THIS IS FOR SINGULAR BUTTON ADDING NOT FOR BATCH YOU IDIOT WHAT THE FUCK
     """
     if bone == "":
         return None
