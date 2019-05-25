@@ -203,6 +203,7 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
 
             (verts, indices, color), (o_verts, o_indices), state = button.draw()
+
             for v in verts:
                 buffer_verts.append(v)
                 buffer_colors.append(color)

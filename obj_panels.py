@@ -52,7 +52,7 @@ class VIEW3D_PT_RigUIPanel(bpy.types.Panel):
                                 bpy.data.armatures[context.scene.rigUI_build_rig], "bones")
             elif context.active_object["rigUI_button_type"] == 1:
                 row = layout.row()
-                row.label(text="YEET")
+                row.label(text="ignore this")
             row = layout.row()
             row.prop(context.active_object, "color")
 

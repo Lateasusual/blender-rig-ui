@@ -21,13 +21,14 @@ def get_collection(name):
 
 
 class RIGUI_OT_AddButton(bpy.types.Operator):
+    """ Adds a collection of buttons to a UI """
     bl_idname = "rigui.add_button"
     bl_label = "Build UI"
     bl_options = {'REGISTER'}
 
-    canvas_collection = bpy.props.StringProperty("collection")
-    layout_text = bpy.props.StringProperty("text")
-    canvas_object = bpy.props.StringProperty("root object")
+    canvas_collection: bpy.props.StringProperty("collection")
+    layout_text: bpy.props.StringProperty("text")
+    canvas_object: bpy.props.StringProperty("root object")
 
 
     def execute(self, context):
@@ -77,8 +78,8 @@ class RIGUI_OT_CreateCanvas(bpy.types.Operator):
     bl_label = "New UI canvas"
     bl_options = {'REGISTER', 'UNDO'}
 
-    new_ui_name = bpy.props.StringProperty(name="Layout name", default="RIGUI_Layout")
-    new_ui_canvas = bpy.props.StringProperty(name="Canvas Collection", default="Collection")
+    new_ui_name: bpy.props.StringProperty(name="Layout name", default="RIGUI_Layout")
+    new_ui_canvas: bpy.props.StringProperty(name="Canvas Collection", default="Collection")
 
     @classmethod
     def poll(cls, context):
