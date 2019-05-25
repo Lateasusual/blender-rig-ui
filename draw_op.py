@@ -188,10 +188,24 @@ class RIGUI_OT_OpenUI(bpy.types.Operator):
         if self.is_box_selecting:  # Draw under buttons
             draw_box(self.box_select_start, self.box_select_end)
 
+        outline_buffer_verts = []
+        outline_buffer_indices = [[], [], [], ]
+        n_verts=0
+
         for button in self.buttons:
             # Add ALL button verts to buffers by shader,
             # then draw them all at once - from 1+n_buttons draw calls to 3+n_shaders
             button.set_offset([width / 2 + self.transform_mod[0], height / 2 + self.transform_mod[1]])
             button.set_scale([100 * self.scale_mod, 100 * self.scale_mod])
-            button.update_shader()
-            button.draw()
+
+            verts, indices, state = button.draw()
+
+            for v in verts:
+                outline_buffer_verts.append(v)
+
+            for i in indices:
+                outline_buffer_indices[state.value].append([i[0]+n_verts, i[1]+n_verts])
+
+            n_verts+=len(verts)
+
+        draw_buffer_outlines(outline_buffer_verts, outline_buffer_indices)

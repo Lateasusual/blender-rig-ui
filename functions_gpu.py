@@ -33,9 +33,10 @@ def draw_buffer_outlines(outline_verts=None,
             [0, 1]
         ]
     shader = gpu.shader.from_builtin('2D_UNIFORM_COLOR')
-    batch_default = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[0])
-    batch_hovered = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[1])
-    batch_selected = batch_for_shader(shader, 'TRIS', {"pos": outline_verts}, indices=indices_all[2])
+    batch_default = batch_for_shader(shader, 'LINES', {"pos": outline_verts}, indices=indices_all[0])
+    batch_hovered = batch_for_shader(shader, 'LINES', {"pos": outline_verts}, indices=indices_all[1])
+    batch_selected = batch_for_shader(shader, 'LINES', {"pos": outline_verts}, indices=indices_all[2])
+    shader.bind()
 
     shader.uniform_float("color", colours[0])
     batch_default.draw(shader)

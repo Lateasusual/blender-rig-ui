@@ -66,8 +66,7 @@ def is_triangle_in_rect(verts, x_range, y_range):
 class button_state(Enum):
     default = 0
     hovered = 1
-    pressed = 2
-    selected = 3
+    selected = 2
 
 
 button_types = {
@@ -226,6 +225,7 @@ class RigUIButton:
         self.update_shader()
 
     def draw(self):
+        self.update_shader()
         if bpy.context.active_object.type == "ARMATURE":
             # if self.linked_bone not in bpy.context.active_object.data.bones:
             #     return  # don't draw if there's nothing to draw :D
@@ -238,6 +238,12 @@ class RigUIButton:
                 self.state = button_state.default
 
         self.shader.bind()
+
+        # draw background
+        self.shader.uniform_float("color", self.color)
+        self.batch.draw(self.shader)
+
+        '''
         color = (0.3, 0.3, 0.3, 1)
 
         if self.state is button_state.hovered:
@@ -245,18 +251,17 @@ class RigUIButton:
         elif self.state is button_state.selected:
             color = (0.8, 0.8, 1.0, 1)
 
-        # draw background
-        self.shader.uniform_float("color", self.color)
-        self.batch.draw(self.shader)
-
         # draw lines
-        self.shader.uniform_float("color", color)
-        self.batch_lines.draw(self.shader)
+        # self.shader.uniform_float("color", color)
+        # self.batch_lines.draw(self.shader)
+        '''
+
+        verts, vertices_lines = self.scale_and_offset_verts()
 
         # draw text
-        verts, notverts = self.scale_and_offset_verts()
-        if bpy.context.scene.rigUI_text_scale >= 0:
+        if bpy.context.scene.rigUI_text_scale > 0:
             draw_text(self.linked_bone, [average_position(verts)[0], average_position(verts)[1]], size=round((self.scale[0] * bpy.context.scene.rigUI_text_scale) / 6))
+        return vertices_lines, self.indices_lines, self.state
 
     def select_type_bone(self, shift, select_only=False):
         if self.linked_bone not in bpy.context.active_object.data.bones:
