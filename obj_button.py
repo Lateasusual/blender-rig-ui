@@ -195,8 +195,6 @@ class RigUIButton:
             "outline_verts": vertex_to_float_array(self.vertices_lines),
             "outline_indices": self.indices_lines,
             "object": self.shape_object_name,
-            "scale": self.scale,
-            "offset": self.offset,
             "color": self.color,
             "bone": self.linked_bone
         }
@@ -234,24 +232,6 @@ class RigUIButton:
                 pass
             elif self.state == button_state.selected:
                 self.state = button_state.default
-
-        # self.shader.bind()
-
-        # self.shader.uniform_float("color", self.color)
-        # self.batch.draw(self.shader)
-
-        '''
-        color = (0.3, 0.3, 0.3, 1)
-
-        if self.state is button_state.hovered:
-            color = (0.5, 0.5, 0.8, 1)
-        elif self.state is button_state.selected:
-            color = (0.8, 0.8, 1.0, 1)
-
-        # draw lines
-        # self.shader.uniform_float("color", color)
-        # self.batch_lines.draw(self.shader)
-        '''
 
         verts, vertices_lines = self.scale_and_offset_verts()
 
@@ -292,6 +272,7 @@ class RigUIButton:
 
     '''
     Refactor all of this so it handles event types discreetly, and support for setting selection other than clicks
+    (blender event manager doesn't allow key polling so held keys isn't an option unfortunately)
     '''
 
     def handle_event(self, context, event):
