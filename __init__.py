@@ -1,117 +1,79 @@
+"""
+Starting point for full code refactor
+This is a work in progress
+"""
+
+from .draw_op import *
+from .obj_operators import *
+from .obj_panels import *
 import bpy
 
 bl_info = {
-    "name": "ViewLayer Manager",
-    "description": "Create, Rename and Remove view layers without changing currently active view layer",
+    "name": "blender-rig-ui",
+    "description": "Editable UI interface for rig animation",
     "author": "Lateasusual",
-    "version": (1, 0, 1),
+    "version": (1, 0, 0),
     "blender": (2, 80, 0),
-    "location": "Header -> View Layer",
-    "warning": '',  # used for warning icon and text in addons panel
-    "wiki_url": "",
-    "category": "User Interface"}
+    "location": "Image Editor",
+    "category": "Animation"
+}
 
+classes = {
+    RIGUI_OT_OpenUI,
+    RIGUI_OT_CloseUI,
+    RIGUI_OT_AddButton,
+    VIEW3D_PT_RigUIPanel,
+    RIGUI_OT_CreateCanvas
+}
 
-class VLM_UL_layers(bpy.types.UIList):
-
-    def draw_item(self,
-                  context,
-                  layout,
-                  data,
-                  item,
-                  icon: int,
-                  active_data,
-                  active_property: str,
-                  index: int = 0,
-                  flt_flag: int = 0):
-        self.use_filter_show = True
-        split = layout.split(factor=0.80, align=True)
-        row = split.row()
-        row.alignment = "LEFT"
-        row.prop(item, "name", text="", expand=False)
-        row.label()
-        row = split.row()
-        row.alignment = "RIGHT"
-        row.operator("scene.remove_view_layer", icon="PANEL_CLOSE", text="")
-        row.prop(item, "use", icon="RENDER_STILL", text="")
-
-
-def disable_collection(col):
-    for child in col.children:
-        disable_collection(child)
-    col.exclude = True
-
-
-
-class VLM_OT_remove_view_layer(bpy.types.Operator):
-    bl_label = "Remove view layer by index"
-    bl_idname = "scene.remove_view_layer"
-
-    def execute(self, context):
-        layer = context.scene.view_layers[context.scene.active_view_layer_index]
-        context.scene.view_layers.remove(layer)
-        return {'FINISHED'}
-
-
-class VLM_OT_add_blank_layer(bpy.types.Operator):
-    bl_label = "Create blank view layer"
-    bl_idname = "scene.view_layer_add_blank"
-
-    def execute(self, context):
-        layer = context.scene.view_layers.new(context.view_layer.name)
-        for c in layer.layer_collection.children:
-            disable_collection(c)
-        return {'FINISHED'}
-
-
-def update_active_layer(self, context):
-    context.window.view_layer = context.scene.view_layers[context.scene.active_view_layer_index]
-
-
-class ViewLayerManager(bpy.types.Operator):
-    bl_label = "ViewLayer Manager"
-    bl_idname = "scene.view_layer_manager"
-
-    view_layer_active = ""
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-
-        layout.template_list("VLM_UL_layers", "", scene, "view_layers", scene, "active_view_layer_index", rows=15)
-        layout.operator("scene.view_layer_add_blank", icon="PLUS")
-
-    def execute(self, context):
-        wm = context.window_manager
-        return wm.invoke_popup(self)  # ,width=500
-
-
-def icon_button(self, context):
-    if context.region.alignment == 'RIGHT':
-        self.layout.operator("scene.view_layer_manager", icon="RENDERLAYERS", text="")
-
-
-classes = [
-    VLM_OT_add_blank_layer,
-    VLM_OT_remove_view_layer,
-    VLM_UL_layers,
-    ViewLayerManager,
+button_types = [
+    ('0', "Bone select", "Selects a bone when pressed"),
+    ('1', "Tab select", "Changes tabs when pressed"),
+    # ('2', "Operator", "Run an operator when pressed")
 ]
 
 
+def ui_icon(self, context):
+    if not context.scene.rigUI_active:
+        op = self.layout.operator("rigui.ui_draw", icon='MOD_ARMATURE', text='')
+    else:
+        op = self.layout.operator("rigui.ui_close", icon='MOD_ARMATURE', text='', depress=True)
+        self.layout.prop_search(context.active_object, "rigUI_ui_name", bpy.data, "texts", text="")
+
+
 def register():
-    for cls in classes:
-        bpy.utils.register_class(cls)
-    bpy.types.Scene.active_view_layer_index = bpy.props.IntProperty(default=0, name="Active view layer index",
-                                                                    update=update_active_layer)
-    bpy.types.TOPBAR_HT_upper_bar.append(icon_button)
+    for c in classes:
+        bpy.utils.register_class(c)
+
+    # Property definitions
+    bpy.types.Scene.rigUI_active = bpy.props.BoolProperty(name="RigUI is Active", default=False, options={'SKIP_SAVE'})
+    bpy.types.Scene.rigUI_collection = bpy.props.StringProperty(name="Canvas Collection", default="None")
+    bpy.types.Scene.rigUI_tag_reload = bpy.props.BoolProperty(default=False)
+    bpy.types.Scene.rigUI_build_text_name = bpy.props.StringProperty(name="Text target", default="RigUI_Layout")
+    bpy.types.Scene.rigUI_build_rig = bpy.props.StringProperty(name="Rig", default="")
+    bpy.types.Object.rigUI_linked_bone = bpy.props.StringProperty(name="Bone", default="")
+    bpy.types.Object.rigUI_ui_name = bpy.props.StringProperty(name="UI", default="")
+    bpy.types.Object.rigUI_button_type = bpy.props.EnumProperty(items=button_types, name="Button Type", default="0")
+    bpy.types.Scene.rigUI_canvas_object = bpy.props.StringProperty(name="Offset Object")
+    bpy.types.Scene.rigUI_text_scale = bpy.props.FloatProperty(name="Text Scale", default=1.0)
+
+    # Prepend for image header here
+    bpy.types.IMAGE_HT_header.prepend(ui_icon)
 
 
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
+    for c in classes:
+        bpy.utils.unregister_class(c)
 
-
+    # Property removals, maybe don't bother since we'll need to restart after unregistering anyway
+    del bpy.types.Scene.rigUI_active
+    del bpy.types.Scene.rigUI_collection
+    del bpy.types.Scene.rigUI_tag_reload
+    del bpy.types.Scene.rigUI_build_text_name
+    del bpy.types.Scene.rigUI_build_rig
+    del bpy.types.Object.rigUI_linked_bone
+    del bpy.types.Object.rigUI_ui_name
+    del bpy.types.Scene.rigUI_canvas_object
 
 
 if __name__ == '__main__':
