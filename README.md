@@ -12,3 +12,5 @@ If it doesn't work check the addon folder in `Appdata/Roaming/Blender Foundation
 https://github.com/Lateasusual/blender-rig-ui/wiki/Setup
  
 Addon is very much WIP, regular updates on the way :)
+
+^ That line was a lie, this hasn't been updated in 2 years. It's still partially functional in modern blender versions, but i'm not actively maintaining it.
